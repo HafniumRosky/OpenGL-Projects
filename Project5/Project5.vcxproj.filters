@@ -1,0 +1,401 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Effect">
+      <UniqueIdentifier>{f6f39ed9-1b27-463f-bf8d-acbcb2164ba8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{8e0c9173-e7cb-41e7-b146-56deb12b92b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneObject">
+      <UniqueIdentifier>{0af88be8-a428-4bd5-a484-ee3ea3cab8b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UtilitiesHeader">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="UtilitiesSource">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="GameObjects">
+      <UniqueIdentifier>{0f3a84f8-4a62-410c-a6a9-8b4fc5e99cc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Ocean">
+      <UniqueIdentifier>{e737d0df-60a7-4b19-b4ae-e2a18b080b43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Ship">
+      <UniqueIdentifier>{3533d0bc-8bed-4098-bc69-7925837a3493}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Skybox">
+      <UniqueIdentifier>{580d4d42-7809-45ee-8b31-7e76f7436b48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Smoke">
+      <UniqueIdentifier>{34e66250-7928-42c9-bf5d-ed36bf1cca61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\CannonBall">
+      <UniqueIdentifier>{ce3153dd-524b-436f-a2cb-49323e24b82a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{a7b67bc3-7153-458b-92c2-45e1286388ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\HDR">
+      <UniqueIdentifier>{a6f56776-91ee-4183-9922-681560ea7943}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\LightProbe">
+      <UniqueIdentifier>{9d1dc4c1-b16e-46b1-b0a7-fc9efe1ea0f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Anime">
+      <UniqueIdentifier>{e9890ce0-e7c4-4a77-864b-a65a1b6b5dff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\PBR">
+      <UniqueIdentifier>{723e3f77-692a-4585-a739-a81c06d8cdd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\PBR\BasicPBR">
+      <UniqueIdentifier>{7670c6c5-2589-4de4-bc34-b5adf040d720}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\PBR\PerfectSurface">
+      <UniqueIdentifier>{75d90f24-d6ab-4744-991a-22af3535baa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UtilitiesSource\ImGui">
+      <UniqueIdentifier>{fb8fdce7-031d-4df1-b67a-e59ff76b4d91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UtilitiesHeader\ImGui">
+      <UniqueIdentifier>{0f7202c4-8a36-4648-8cc0-680ce26c3efc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>UtilitiesSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.cpp">
+      <Filter>Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="InputLayout.cpp">
+      <Filter>SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="StbImage.cpp">
+      <Filter>UtilitiesSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Ship.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Ocean.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Ball.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="GIScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="LightProbe.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="AssignmentScene1.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationScene1.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="AirPlane.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="AssignmentScene2.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Dragon.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationScene2.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="AssignmentScene3.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_glut.cpp">
+      <Filter>UtilitiesSource\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui.cpp">
+      <Filter>UtilitiesSource\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_demo.cpp">
+      <Filter>UtilitiesSource\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_draw.cpp">
+      <Filter>UtilitiesSource\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_tables.cpp">
+      <Filter>UtilitiesSource\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_widgets.cpp">
+      <Filter>UtilitiesSource\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
+      <Filter>UtilitiesSource\ImGui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Effect.h">
+      <Filter>Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="InputLayout.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyboard.h">
+      <Filter>UtilitiesHeader</Filter>
+    </ClInclude>
+    <ClInclude Include="Mouse.h">
+      <Filter>UtilitiesHeader</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="LightHelper.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Ship.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Ocean.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTexture.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Ball.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="GIScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="LightProbe.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="AssignmentScene1.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationScene1.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="AirPlane.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="AssignmentScene2.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Dragon.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationScene2.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="AssignmentScene3.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imconfig.h">
+      <Filter>UtilitiesHeader\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui.h">
+      <Filter>UtilitiesHeader\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_glut.h">
+      <Filter>UtilitiesHeader\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_internal.h">
+      <Filter>UtilitiesHeader\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_rectpack.h">
+      <Filter>UtilitiesHeader\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_textedit.h">
+      <Filter>UtilitiesHeader\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_truetype.h">
+      <Filter>UtilitiesHeader\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_opengl3.h">
+      <Filter>UtilitiesHeader\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_opengl3_loader.h">
+      <Filter>UtilitiesHeader\ImGui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\OceanVS.glsl">
+      <Filter>Shader\Ocean</Filter>
+    </None>
+    <None Include="Assets\Shaders\OceanHS.glsl">
+      <Filter>Shader\Ocean</Filter>
+    </None>
+    <None Include="Assets\Shaders\OceanFS.glsl">
+      <Filter>Shader\Ocean</Filter>
+    </None>
+    <None Include="Assets\Shaders\OceanDS.glsl">
+      <Filter>Shader\Ocean</Filter>
+    </None>
+    <None Include="Assets\Shaders\ShipFS.glsl">
+      <Filter>Shader\Ship</Filter>
+    </None>
+    <None Include="Assets\Shaders\ShipVS.glsl">
+      <Filter>Shader\Ship</Filter>
+    </None>
+    <None Include="Assets\Shaders\SkyboxVS.glsl">
+      <Filter>Shader\Skybox</Filter>
+    </None>
+    <None Include="Assets\Shaders\SkyboxFS.glsl">
+      <Filter>Shader\Skybox</Filter>
+    </None>
+    <None Include="Assets\Shaders\OceanCS.glsl">
+      <Filter>Shader\Ocean</Filter>
+    </None>
+    <None Include="Assets\Shaders\DepthCS.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Assets\Shaders\DepthInitCS.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Assets\Shaders\SmokeUpdateGS.glsl">
+      <Filter>Shader\Smoke</Filter>
+    </None>
+    <None Include="Assets\Shaders\SmokeUpdateVS.glsl">
+      <Filter>Shader\Smoke</Filter>
+    </None>
+    <None Include="Assets\Shaders\SmokeRenderFS.glsl">
+      <Filter>Shader\Smoke</Filter>
+    </None>
+    <None Include="Assets\Shaders\SmokeRenderGS.glsl">
+      <Filter>Shader\Smoke</Filter>
+    </None>
+    <None Include="Assets\Shaders\SmokeRenderVS.glsl">
+      <Filter>Shader\Smoke</Filter>
+    </None>
+    <None Include="Assets\Shaders\CannonBallFS.glsl">
+      <Filter>Shader\CannonBall</Filter>
+    </None>
+    <None Include="Assets\Shaders\CannonBallVS.glsl">
+      <Filter>Shader\CannonBall</Filter>
+    </None>
+    <None Include="Assets\Shaders\BasicPBRFS.glsl">
+      <Filter>Shader\PBR\BasicPBR</Filter>
+    </None>
+    <None Include="Assets\Shaders\BasicPBRVS.glsl">
+      <Filter>Shader\PBR\BasicPBR</Filter>
+    </None>
+    <None Include="Assets\Shaders\HDRSamplerFS.glsl">
+      <Filter>Shader\HDR</Filter>
+    </None>
+    <None Include="Assets\Shaders\HDRSamplerVS.glsl">
+      <Filter>Shader\HDR</Filter>
+    </None>
+    <None Include="Assets\Shaders\HDREnvMapFS.glsl">
+      <Filter>Shader\HDR</Filter>
+    </None>
+    <None Include="Assets\Shaders\HDREnvMapVS.glsl">
+      <Filter>Shader\HDR</Filter>
+    </None>
+    <None Include="Assets\Shaders\DualParaGenFS.glsl">
+      <Filter>Shader\LightProbe</Filter>
+    </None>
+    <None Include="Assets\Shaders\DualParaGenVS.glsl">
+      <Filter>Shader\LightProbe</Filter>
+    </None>
+    <None Include="Assets\Shaders\BasicPBRNoTexFS.glsl">
+      <Filter>Shader\PBR\BasicPBR</Filter>
+    </None>
+    <None Include="Assets\Shaders\BasicPBRNoTexVS.glsl">
+      <Filter>Shader\PBR\BasicPBR</Filter>
+    </None>
+    <None Include="Assets\Shaders\AnimeVS.glsl">
+      <Filter>Shader\Anime</Filter>
+    </None>
+    <None Include="Assets\Shaders\AnimeFS.glsl">
+      <Filter>Shader\Anime</Filter>
+    </None>
+    <None Include="Assets\Shaders\OutlineFS.glsl">
+      <Filter>Shader\Anime</Filter>
+    </None>
+    <None Include="Assets\Shaders\OutlineVS.glsl">
+      <Filter>Shader\Anime</Filter>
+    </None>
+    <None Include="Assets\Shaders\BakeGIDiffFS.glsl">
+      <Filter>Shader\LightProbe</Filter>
+    </None>
+    <None Include="Assets\Shaders\BakeGIDiffVS.glsl">
+      <Filter>Shader\LightProbe</Filter>
+    </None>
+    <None Include="Assets\Shaders\PerfectSurfaceFS.glsl">
+      <Filter>Shader\PBR\PerfectSurface</Filter>
+    </None>
+    <None Include="Assets\Shaders\PerfectSurfaceVS.glsl">
+      <Filter>Shader\PBR\PerfectSurface</Filter>
+    </None>
+    <None Include="Assets\Shaders\BasicPBRTangentFS.glsl">
+      <Filter>Shader\PBR\BasicPBR</Filter>
+    </None>
+    <None Include="Assets\Shaders\BasicPBRTangentVS.glsl">
+      <Filter>Shader\PBR\BasicPBR</Filter>
+    </None>
+  </ItemGroup>
+</Project>

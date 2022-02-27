@@ -17,6 +17,7 @@ private:
 
 	void GeneratePlane(MeshData& texturePlane);
 	void GenerateDualParaMap(GLsizei& width, GLsizei& height, MeshData* texturePlane = nullptr);
+	void GenerateLUT(GLsizei& size, MeshData* texturePlane = nullptr);
 public:
 	LightProbe() = default;
 	LightProbe(VertexType type, std::string lightProbeName, std::string sceneName, bool isGlobal, std::string skyboxName = "")
@@ -27,10 +28,11 @@ public:
 		m_skyboxName = skyboxName;
 		m_isGlobal = isGlobal;
 	}
-	void LoadLightProbe(GLsizei irrWidth, GLsizei irrHeight, GLsizei prefilterSize);
+	void LoadLightProbe(GLsizei irrWidth, GLsizei irrHeight, GLsizei prefilterSize, GLsizei LUTSize);
 	void SampleCube(float face);
 	void GenerateIrradianceMap(int numAzimuth, int numZenith);
 	void Prefilter(float roughness);
+	void IntegrateBRDF();
 
 	std::string getProbeName()
 	{

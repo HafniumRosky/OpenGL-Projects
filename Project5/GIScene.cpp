@@ -12,6 +12,9 @@ void GIScene::Start()
 	//Prefilter map shader
 	m_prefilterMapVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\PrefilterMapVS.glsl");
 	m_prefilterMapFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\PrefilterMapFS.glsl");
+	//Integrate BRDF shader
+	m_IntegrateBRDFVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\IntegrateBRDFVS.glsl");
+	m_IntegrateBRDFFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\IntegrateBRDFFS.glsl");
 	//HDR sampler shader
 	m_HDRSamplerVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\HDRSamplerVS.glsl");
 	m_HDRSamplerFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\HDRSamplerFS.glsl");
@@ -32,6 +35,9 @@ void GIScene::Start()
 	//Prefilter map shader
 	m_prefilterMapEffect.AddShader(&m_prefilterMapVertexShader, &m_prefilterMapFragShader);
 	m_prefilterMapEffect.BindShaders();
+	//Integrate BRDF Effect
+	m_IntegrateBRDFEffect.AddShader(&m_IntegrateBRDFVertexShader, &m_IntegrateBRDFFragShader);
+	m_IntegrateBRDFEffect.BindShaders();
 	//HDR sampler effect
 	m_HDRSamplerEffect.AddShader(&m_HDRSamplerVertexShader, &m_HDRSamplerFragShader);
 	m_HDRSamplerEffect.BindShaders();
@@ -57,10 +63,21 @@ void GIScene::Start()
 
 	//Load GameObjects
 	//PBR material sphere
-	m_sphere = Ball(VertexPosNormalTex, 1.0f, 20.0f, 20.0f, vec4(1.0f), "PBRRustedIron");
-	m_sphere.GetTransform().SetPosition(vec3(0.0f, 0.0f, 0.0f));
-	m_sphere.LoadPBRGameObject(vec3(1.0f), 0.1f, 0.1f);
-	m_sphere.SetMeshEffectWithIndex(&m_basicPBREffect, 0);
+	//m_sphere = Ball(VertexPosNormalTex, 1.0f, 50.0f, 50.0f, vec4(1.0f), "PBRRustedIron");
+	//m_sphere.GetTransform().SetPosition(vec3(0.0f, 0.0f, 0.0f));
+	//m_sphere.LoadPBRGameObject(vec3(1.0f), 0.2f, 0.1f);
+	//m_sphere.SetMeshEffectWithIndex(&m_basicPBREffect, 0);
+
+	for (int i = 0; i < 6; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			m_sphere[i * 6 + j] = Ball(VertexPosNormalTex, 0.5f, 50.0f, 50.0f, vec4(1.0f), "PBRRustedIron");
+			m_sphere[i * 6 + j].GetTransform().SetPosition(vec3(-3.5f + j * 1.5f, 4.0f - i * 1.5f, 0.0f));
+			m_sphere[i * 6 + j].LoadPBRGameObject(vec3(1.0f), j * 0.2f, i * 0.2f);
+			m_sphere[i * 6 + j].SetMeshEffectWithIndex(&m_basicPBREffect, 0);
+		}
+	}
 
 
 	//Camera
@@ -70,7 +87,7 @@ void GIScene::Start()
 	//Set transform
 	//Set camera position
 	//m_camera.GetTransform().SetPosition(vec3(8.0f, 8.0f, 8.0f));
-	m_camera.GetTransform().SetPosition(0.0f, 0.0f, 5.0f);
+	m_camera.GetTransform().SetPosition(0.0f, 0.0f, 9.0f);
 	//Set camera target
 	//m_camera.SetTarget(m_playerShip.GetTransform().GetPosition() + vec3(0.0f, 3.0f, 0.0f));
 	m_camera.SetTarget(vec3(0.0f));
@@ -94,7 +111,7 @@ void GIScene::Start()
 	m_HDREnvir = LightProbe(VertexPos, "Global", "GIScene", true, "Tropical_Beach_3k.hdr");
 	m_HDREnvir.GetTransform().SetPosition(m_samplerCam.GetTransform().GetPosition());
 	m_HDREnvir.LoadHDRSampler(m_HDRCubeWidth, m_HDRCubeHeight);
-	m_HDREnvir.LoadLightProbe(m_HDRCubeWidth, m_HDRCubeHeight, m_prefilterResolution);
+	m_HDREnvir.LoadLightProbe(m_HDRCubeWidth, m_HDRCubeHeight, m_prefilterResolution, m_BRDFLUTResolution);
 }
 
 void GIScene::SampleHDR()
@@ -147,11 +164,11 @@ void GIScene::SampleHDR()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		m_HDREnvir.SampleHDR();
 
-		//Generate mip maps
-		glBindTexture(GL_TEXTURE_2D, m_HDREnvir.GetMeshTextureID(0, 1));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glGenerateMipmap(GL_TEXTURE_2D);
 	}
+	//Generate mip maps
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_HDREnvir.GetMeshTextureID(0, 1));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 void GIScene::TransformCubeToDualPara()
@@ -272,10 +289,14 @@ void GIScene::BakeIrradianceMap()
 		strStream >> numString;
 		std::string savePath = "../Project5\\Assets\\Precomputation\\Probe" + m_HDREnvir.getProbeName() + "\\IrradianceMap" + numString + ".hdr";
 		stbi_write_hdr(savePath.c_str(), m_HDRCubeWidth, m_HDRCubeHeight, 3, data);
-		//Bind irradiance map to the probe
-		m_HDREnvir.SetIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
-		//For test
-		m_sphere.PushIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
+	}
+	//Bind irradiance map to the probe
+	m_HDREnvir.SetIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
+	//For test
+	//m_sphere.PushIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
+	for (int i = 0; i < 36; i++)
+	{
+		m_sphere[i].PushIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
 	}
 }
 
@@ -283,8 +304,41 @@ void GIScene::BakePrefilteredMap()
 {
 	m_HDREnvir.SetMeshEffectWithIndex(&m_prefilterMapEffect, 0);
 	m_HDREnvir.InputAssemble(0);
-	//Sampler the HDR map for 6 times for each face
+
 	m_samplerCam.BindFBO(0);
+
+	//Swap render states
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	//list 6 faces properties for the camera
+	vec3 targetVec[] =
+	{
+		vec3(1.0f, 0.0f, 0.0f),
+		vec3(-1.0f, 0.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		vec3(0.0f, -1.0f, 0.0f),
+		vec3(0.0f, 0.0f, 1.0f),
+		vec3(0.0f, 0.0f, -1.0f)
+	};
+
+	vec3 upVec[] =
+	{
+		vec3(0.0f, -1.0f, 0.0f),
+		vec3(0.0f, -1.0f, 0.0f),
+		vec3(0.0f, 0.0f, 1.0f),
+		vec3(0.0f, 0.0f, -1.0f),
+		vec3(0.0f, -1.0f, 0.0f),
+		vec3(0.0f, -1.0f, 0.0f)
+	};
+	Effect::cbResize.proj = m_samplerCam.GetProj();
+	glBindBuffer(GL_UNIFORM_BUFFER, Effect::m_UBOid[2]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesOnResize), &Effect::cbResize, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 	//filter all mip maps
 	for (unsigned int i = 0; i < m_maxMipLevel; i++)
 	{
@@ -295,36 +349,6 @@ void GIScene::BakePrefilteredMap()
 		//Resize view port
 		glViewport(0, 0, mipResolution, mipResolution);
 		float roughness = i / (float)(m_maxMipLevel - 1);
-		//Swap render states
-		glDepthMask(GL_TRUE);
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		//list 6 faces properties for the camera
-		vec3 targetVec[] =
-		{
-			vec3(1.0f, 0.0f, 0.0f),
-			vec3(-1.0f, 0.0f, 0.0f),
-			vec3(0.0f, 1.0f, 0.0f),
-			vec3(0.0f, -1.0f, 0.0f),
-			vec3(0.0f, 0.0f, 1.0f),
-			vec3(0.0f, 0.0f, -1.0f)
-		};
-
-		vec3 upVec[] =
-		{
-			vec3(0.0f, -1.0f, 0.0f),
-			vec3(0.0f, -1.0f, 0.0f),
-			vec3(0.0f, 0.0f, 1.0f),
-			vec3(0.0f, 0.0f, -1.0f),
-			vec3(0.0f, -1.0f, 0.0f),
-			vec3(0.0f, -1.0f, 0.0f)
-		};
-		Effect::cbResize.proj = m_samplerCam.GetProj();
-		glBindBuffer(GL_UNIFORM_BUFFER, Effect::m_UBOid[2]);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesOnResize), &Effect::cbResize, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		//prefilter 6 different faces
 		for (unsigned int j = 0; j < 6; j++)
@@ -338,13 +362,65 @@ void GIScene::BakePrefilteredMap()
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 			//Bind mip map to the render target
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_HDREnvir.GetMeshTextureID(0, 3), i);
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, m_HDREnvir.GetMeshTextureID(0, 3), i);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			//Prefilter
 			m_HDREnvir.Prefilter(roughness);
 		}
 	}
+	//m_sphere.PushPrefilteredMap(m_HDREnvir.GetMeshTexture(0, 3));
+	for (int i = 0; i < 36; i++)
+	{
+		m_sphere[i].PushPrefilteredMap(m_HDREnvir.GetMeshTexture(0, 3));
+	}
+}
 
+void GIScene::IntegrateBRDF()
+{
+	m_HDREnvir.SetMeshEffectWithIndex(&m_IntegrateBRDFEffect, 1);
+	m_HDREnvir.InputAssemble(1);
+
+	m_samplerCam.BindFBO(0);
+
+	glViewport(0, 0, m_BRDFLUTResolution, m_BRDFLUTResolution);
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	Effect::cbResize.proj = m_samplerCam.GetProj();
+	glBindBuffer(GL_UNIFORM_BUFFER, Effect::m_UBOid[2]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesOnResize), &Effect::cbResize, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	m_samplerCam.SetTarget(vec3(0.0f, 0.0f, 1.0f));
+	m_samplerCam.LookAt(vec3(0.0f, -1.0f, 0.0f));
+	Effect::cbFrame.view = m_samplerCam.GetView();
+	glBindBuffer(GL_UNIFORM_BUFFER, Effect::m_UBOid[1]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesEveryFrame), &Effect::cbFrame, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	//Bind textures to the frame buffer
+	glBindRenderbuffer(GL_RENDERBUFFER, m_samplerCam.GetRBO(0));
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_BRDFLUTResolution, m_BRDFLUTResolution);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_HDREnvir.GetMeshTextureID(1, 0), 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//Integrate BRDF
+	m_HDREnvir.IntegrateBRDF();
+
+	//Save LUT in local files
+	GLfloat* data = new GLfloat[m_BRDFLUTResolution * m_BRDFLUTResolution * 3];
+	glBindTexture(GL_TEXTURE_2D, m_HDREnvir.GetMeshTextureID(1, 0));
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, data);
+	std::string savePath = "../Project5\\Assets\\Precomputation\\Probe" + m_HDREnvir.getProbeName() + "\\BRDFLUT.hdr";
+	stbi_write_hdr(savePath.c_str(), m_BRDFLUTResolution, m_BRDFLUTResolution, 3, data);
+
+	//m_sphere.PushLUT(m_HDREnvir.GetMeshTexture(1, 0));
+	for (int i = 0; i < 36; i++)
+	{
+		m_sphere[i].PushLUT(m_HDREnvir.GetMeshTexture(1, 0));
+	}
 }
 
 void GIScene::Bake()
@@ -355,6 +431,8 @@ void GIScene::Bake()
 	//Specular
 	//Prefiltered environment map
 	BakePrefilteredMap();
+	//Integrating BRDF
+	IntegrateBRDF();
 }
 
 void GIScene::InitiScene()
@@ -362,7 +440,7 @@ void GIScene::InitiScene()
 	//Game object
 	//Load buffers of meshes
 	
-	m_sphere.InputAssemble();
+	//m_sphere.InputAssemble();
 
 	//Initialize constant buffer
 
@@ -435,6 +513,11 @@ void GIScene::InitiScene()
 	//Bind rendering effect
 	m_HDREnvir.SetMeshEffectWithIndex(&m_HDREnvMapEffect, 0);
 	m_HDREnvir.InputAssemble(0);
+
+	for (int i = 0; i < 36; i++)
+	{
+		m_sphere[i].InputAssemble();
+	}
 }
 
 void GIScene::RenderObjects()
@@ -464,7 +547,8 @@ void GIScene::RenderObjects()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glDepthMask(GL_TRUE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_sphere.DrawPBR();
+	for(int i = 0; i < 36; i++)
+		m_sphere[i].DrawPBR();
 	//Draw Environment map
 	glDepthFunc(GL_LEQUAL);
 	m_HDREnvir.Draw(1);

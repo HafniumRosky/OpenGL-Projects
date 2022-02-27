@@ -1,0 +1,36 @@
+﻿  Effect.cpp
+  GameObject.cpp
+  InputLayout.cpp
+  main.cpp
+  Shader.cpp
+Effect.obj : error LNK2001: 无法解析的外部符号 __imp___glewUseProgram
+Effect.obj : error LNK2001: 无法解析的外部符号 __imp___glewCreateProgram
+Effect.obj : error LNK2001: 无法解析的外部符号 __imp___glewValidateProgram
+Effect.obj : error LNK2001: 无法解析的外部符号 __imp___glewGetProgramiv
+Effect.obj : error LNK2001: 无法解析的外部符号 __imp___glewAttachShader
+Effect.obj : error LNK2001: 无法解析的外部符号 __imp___glewGetProgramInfoLog
+Effect.obj : error LNK2001: 无法解析的外部符号 __imp___glewLinkProgram
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewEnableVertexAttribArray
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewBindVertexArray
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewVertexAttribPointer
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glutCreateWindowWithExit
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewGetShaderiv
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewCompileShader
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewGetAttribLocation
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewCreateShader
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glutInitWithExit
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewBindBuffer
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewGetShaderInfoLog
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewBufferSubData
+main.obj : error LNK2001: 无法解析的外部符号 __imp_glewGetErrorString
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewBufferData
+main.obj : error LNK2001: 无法解析的外部符号 __imp_glutInitDisplayMode
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewShaderSource
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewGenVertexArrays
+main.obj : error LNK2001: 无法解析的外部符号 __imp_glutDisplayFunc
+main.obj : error LNK2001: 无法解析的外部符号 __imp_glutMainLoop
+main.obj : error LNK2001: 无法解析的外部符号 __imp___glewGenBuffers
+main.obj : error LNK2001: 无法解析的外部符号 __imp_glutInitWindowSize
+main.obj : error LNK2001: 无法解析的外部符号 __imp_glewInit
+main.obj : error LNK2001: 无法解析的外部符号 __imp_glutSwapBuffers
+C:\Users\69494\source\repos\Project5\x64\Release\CGProject.exe : fatal error LNK1120: 30 个无法解析的外部命令

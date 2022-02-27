@@ -47,6 +47,16 @@ public:
 		m_meshVec[0].m_TextureVec.push_back(irrTex);
 	}
 
+	void PushPrefilteredMap(Texture prefilteredTex)
+	{
+		m_meshVec[0].m_TextureVec.push_back(prefilteredTex);
+	}
+
+	void PushLUT(Texture LUT)
+	{
+		m_meshVec[0].m_TextureVec.push_back(LUT);
+	}
+
 	void SetDirection(vec3 dir)
 	{
 		m_direction = dir;

@@ -439,5 +439,11 @@
     <None Include="Assets\Shaders\PrefilterMapVS.glsl">
       <Filter>Shader\LightProbe</Filter>
     </None>
+    <None Include="Assets\Shaders\IntegrateBRDFFS.glsl">
+      <Filter>Shader\LightProbe</Filter>
+    </None>
+    <None Include="Assets\Shaders\IntegrateBRDFVS.glsl">
+      <Filter>Shader\LightProbe</Filter>
+    </None>
   </ItemGroup>
 </Project>

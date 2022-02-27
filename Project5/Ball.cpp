@@ -170,8 +170,14 @@ void Ball::DrawPBR()
 	texTarget.push_back(GL_TEXTURE_2D);
 	//test
 	texIDVec.push_back(m_meshVec[0].m_TextureVec[3].texID);
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[4].texID);
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[5].texID);
 	texParaNameVec.push_back("irradianceMap");
+	texParaNameVec.push_back("prefilteredMap");
+	texParaNameVec.push_back("BRDFLUT");
 	texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+	texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+	texTarget.push_back(GL_TEXTURE_2D);
 
 	if (m_loadNormal)
 	{

@@ -264,6 +264,8 @@
     <None Include="Assets\Shaders\HDREnvMapVS.glsl" />
     <None Include="Assets\Shaders\HDRSamplerFS.glsl" />
     <None Include="Assets\Shaders\HDRSamplerVS.glsl" />
+    <None Include="Assets\Shaders\IntegrateBRDFFS.glsl" />
+    <None Include="Assets\Shaders\IntegrateBRDFVS.glsl" />
     <None Include="Assets\Shaders\OceanCS.glsl" />
     <None Include="Assets\Shaders\OceanDS.glsl" />
     <None Include="Assets\Shaders\OceanFS.glsl" />

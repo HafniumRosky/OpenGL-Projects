@@ -15,6 +15,7 @@ private:
 	unsigned int m_maxMipLevel = 5;
 
 	GLsizei m_prefilterResolution = 128;
+	GLsizei m_BRDFLUTResolution = 512;
 
 	GLsizei m_sceneWidth = 1920;
 	GLsizei m_sceneHeight = 1080;
@@ -33,6 +34,9 @@ private:
 	//Prefilter map shader
 	Shader m_prefilterMapVertexShader;
 	Shader m_prefilterMapFragShader;
+	//Intergrate BRDF shader
+	Shader m_IntegrateBRDFVertexShader;
+	Shader m_IntegrateBRDFFragShader;
 	//HDR sampler shader
 	Shader m_HDRSamplerVertexShader;
 	Shader m_HDRSamplerFragShader;
@@ -53,6 +57,8 @@ private:
 	Effect m_diffuseIrradianceEffect;
 	//Prefilter map effect
 	Effect m_prefilterMapEffect;
+	//Intergrate BRDF effect
+	Effect m_IntegrateBRDFEffect;
 	//HDR sampler effect
 	Effect m_HDRSamplerEffect;
 	//HDR environment map effect
@@ -71,7 +77,8 @@ private:
 
 	//GameObjects
 	//PBR material sphere
-	Ball m_sphere;
+	//Ball m_sphere;
+	Ball m_sphere[36];
 	//HDR environment
 	LightProbe m_HDREnvir;
 	GLsizei m_HDRCubeWidth = 512;
@@ -98,6 +105,7 @@ private:
 	void TransformCubeToDualPara();
 	void BakeIrradianceMap();
 	void BakePrefilteredMap();
+	void IntegrateBRDF();
 	void Bake();
 
 public:

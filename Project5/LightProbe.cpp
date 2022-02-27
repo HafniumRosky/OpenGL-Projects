@@ -88,7 +88,24 @@ void LightProbe::GenerateDualParaMap(GLsizei& width, GLsizei& height, MeshData* 
     }
 }
 
-void LightProbe::LoadLightProbe(GLsizei irrWidth, GLsizei irrHeight, GLsizei prefilterSize)
+void LightProbe::GenerateLUT(GLsizei& size, MeshData* texturePlane)
+{
+    Texture LUTTexture;
+    glGenTextures(1, &LUTTexture.texID);
+
+    // pre-allocate enough memory for the LUT texture.
+    glBindTexture(GL_TEXTURE_2D, LUTTexture.texID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, size, size, 0, GL_RG, GL_FLOAT, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (texturePlane != nullptr)
+        texturePlane->m_TextureVec.push_back(LUTTexture);
+}
+
+void LightProbe::LoadLightProbe(GLsizei irrWidth, GLsizei irrHeight, GLsizei prefilterSize, GLsizei LUTSize)
 {
     /*//Dual-paraboloid map
     //Check if the map is saved
@@ -115,6 +132,14 @@ void LightProbe::LoadLightProbe(GLsizei irrWidth, GLsizei irrHeight, GLsizei pre
 
     //Prifilter map
     GenerateEmptyCubeMap(m_meshVec[0], prefilterSize, prefilterSize, true); //texture0, 3
+
+    //BRDF LUT
+    MeshData texturePlane;//mesh 1
+    texturePlane.SetVertexType(m_type);
+    texturePlane.m_name = "TexturePlane";
+    GeneratePlane(texturePlane);
+    GenerateLUT(LUTSize, &texturePlane);//texture 1, 0
+    m_meshVec.push_back(texturePlane);
 }
 
 void LightProbe::SampleCube(float face)
@@ -161,7 +186,7 @@ void LightProbe::Prefilter(float roughness)
     //Bind effect
     m_meshVec[0].m_pEffect->BindEffect();
     //Update uniform value
-    glUniform1i(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "roughness"), roughness);
+    glUniform1f(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "roughness"), roughness);
     //Bind cube map
     std::vector<GLuint> texIDVec;
     std::vector<const char*> texParaNameVec;
@@ -173,4 +198,13 @@ void LightProbe::Prefilter(float roughness)
 
     m_meshVec[0].BindVertexArray();
     glDrawElements(GL_TRIANGLES, m_meshVec[0].m_indexVec.size(), GL_UNSIGNED_INT, 0);
+}
+
+void LightProbe::IntegrateBRDF()
+{
+    //Bind effect
+    m_meshVec[1].m_pEffect->BindEffect();
+    
+    m_meshVec[1].BindVertexArray();
+    glDrawElements(GL_TRIANGLES, m_meshVec[1].m_indexVec.size(), GL_UNSIGNED_INT, 0);
 }

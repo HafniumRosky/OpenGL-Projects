@@ -67,6 +67,8 @@ uniform sampler2D metallicMap;
 uniform sampler2D roughnessMap;
 //test
 uniform samplerCube irradianceMap;
+uniform samplerCube prefilteredMap;
+uniform sampler2D BRDFLUT;
 
 float PI = 3.14159265359;
 
@@ -76,6 +78,11 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }  
+
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
 
 float DistributionGGX(float NdotH, float roughness)
 {
@@ -100,6 +107,7 @@ float GeometrySchlickGGX(float NdotV, float roughness)
 	
     return num / denom;
 }
+
 float GeometrySmith(float NdotL, float NdotV, float roughness)
 {
     float ggx2  = GeometrySchlickGGX(NdotV, roughness);
@@ -125,7 +133,7 @@ void main()
 
 	vec3 Lo = vec3(0.0);
 	//Point light
-	for(int i = 0; i < numPointLight; i++)
+	/*for(int i = 0; i < numPointLight; i++)
 	{
 		vec3 lightVec = normalize(pointLight[i].position - pIn.posW);
 		vec3 halfVec = normalize(viewDir + lightVec);
@@ -143,7 +151,7 @@ void main()
 		float denominator = 4.0 * NdotV * NdotL  + 0.0001;
 		vec3 specular = DFG / denominator;
 		
-		vec3 ks = F;
+		vec3 ks = fresnelSchlickRoughness(NdotV, F0, roughness); ;
 		vec3 kd = vec3(1.0) - ks;
 		kd *= 1.0 - metallic;
 		Lo += (kd * albedo / PI + ks * specular) * radiance * NdotL;
@@ -171,12 +179,35 @@ void main()
 		kd *= 1.0 - metallic;
 		Lo += (kd * albedo / PI + ks * specular) * radiance * NdotL;
 	}
+	*/
 
-	vec3 ambient = vec3(0.3) * albedo * texture(irradianceMap, normalW).rgb;
+	vec3 R = reflect(-viewDir, normalW);
+	const float MAX_REFLECTION_LOD = 4.0;
+	vec3 prefilteredColor = textureLod(prefilteredMap, R,  roughness * MAX_REFLECTION_LOD).rgb;  
+
+	float NdotV = max(dot(normalW, viewDir), 0.0);
+	vec3 F = FresnelSchlickRoughness(NdotV, F0, roughness);
+	vec2 envBRDF = texture(BRDFLUT, vec2(NdotV, roughness)).rg;
+	vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+
+	vec3 kS = F;
+	vec3 kD = 1.0 - kS;
+	kD *= 1.0 - metallic;	  
+  
+	vec3 irradiance = texture(irradianceMap, normalW).rgb;
+	vec3 diffuse = irradiance * albedo;
+
+	Lo = kS * specular + kD * diffuse;
+	vec3 color = Lo;
+	color = pow(color, vec3(1.0/2.2)); 
+	FragColor = vec4(color, 1.0);
+
+
+	/*vec3 ambient = vec3(0.3) * albedo * texture(irradianceMap, normalW).rgb;
 	vec3 color = ambient + Lo;
 
 	//color = color / (color + vec3(1.0));
 	color = pow(color, vec3(1.0/2.2)); 
 
-	FragColor = vec4(color, 1.0);
+	FragColor = vec4(color, 1.0);*/
 }

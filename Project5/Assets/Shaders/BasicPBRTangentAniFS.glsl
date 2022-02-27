@@ -57,16 +57,16 @@ layout (std140, binding = 5) uniform CBChangeEveryDrawingPBR
 
 in v2f
 {
-	vec3 posW;
-	vec3 normalW;
-	vec2 uv;
+	vec4 uv;
+	vec4 TtoW0;
+	vec4 TtoW1;
+	vec4 TtoW2;
 }pIn;
 
 uniform sampler2D albedoMap;
 uniform sampler2D metallicMap;
 uniform sampler2D roughnessMap;
-//test
-uniform samplerCube irradianceMap;
+uniform sampler2D normalMap;
 
 float PI = 3.14159265359;
 
@@ -113,12 +113,18 @@ void main()
 	float useAlbedoMap = step(material.albedo.x, 0.0);
 	float useMetallicMap = step(material.metallic, 0.0);
 	float useRoughnessMap = step(material.roughness, 0.0);
-	vec3 albedo = pow(texture(albedoMap, pIn.uv).rgb * useAlbedoMap + (1 - useAlbedoMap) * material.albedo, vec3(2.2));
-    float metallic = texture(metallicMap, pIn.uv).r * useMetallicMap + (1 - useMetallicMap) * material.metallic;
-    float roughness = texture(roughnessMap, pIn.uv).r * useRoughnessMap + (1 - useRoughnessMap) * material.roughness;
+	vec3 albedo = pow(texture(albedoMap, pIn.uv.xy).rgb * useAlbedoMap + (1 - useAlbedoMap) * material.albedo, vec3(2.2));
+    float metallic = texture(metallicMap, pIn.uv.xy).r * useMetallicMap + (1 - useMetallicMap) * material.metallic;
+    float roughness = texture(roughnessMap, pIn.uv.xy).r * useRoughnessMap + (1 - useRoughnessMap) * material.roughness;
 
-	vec3 normalW = normalize(pIn.normalW); 
-    vec3 viewDir = normalize(eyePos - pIn.posW);
+	vec3 posW = vec3(pIn.TtoW0.w, pIn.TtoW1.w, pIn.TtoW2.w);
+
+	vec3 normalW = texture(normalMap, pIn.uv.zw).rgb; 
+	normalW = normalize(normalW * 2.0 - 1.0);
+	normalW = normalize(vec3(dot(pIn.TtoW0.xyz, normalW), dot(pIn.TtoW1.xyz, normalW), dot(pIn.TtoW2.xyz, normalW)));
+
+
+    vec3 viewDir = normalize(eyePos - posW);
 
 	vec3 F0 = vec3(0.04); 
 	F0 = mix(F0, albedo, metallic);
@@ -127,9 +133,9 @@ void main()
 	//Point light
 	for(int i = 0; i < numPointLight; i++)
 	{
-		vec3 lightVec = normalize(pointLight[i].position - pIn.posW);
+		vec3 lightVec = normalize(pointLight[i].position - posW);
 		vec3 halfVec = normalize(viewDir + lightVec);
-		float lightDistance = length(pointLight[i].position - pIn.posW);
+		float lightDistance = length(pointLight[i].position - posW);
 		float atten = 1.0 /(lightDistance, lightDistance);
 		vec3 radiance = pointLight[i].color.rgb * atten;
 		float NdotH = max(dot(normalW, halfVec), 0.0);
@@ -147,7 +153,6 @@ void main()
 		vec3 kd = vec3(1.0) - ks;
 		kd *= 1.0 - metallic;
 		Lo += (kd * albedo / PI + ks * specular) * radiance * NdotL;
-		//Lo += (ks * specular) * radiance * NdotL + kd * albedo * texture(irradianceMap, normalW).rgb;
 	}
 	//Analytical light
 	for(int i = 0; i < numDirLight; i++)
@@ -172,7 +177,7 @@ void main()
 		Lo += (kd * albedo / PI + ks * specular) * radiance * NdotL;
 	}
 
-	vec3 ambient = vec3(0.3) * albedo * texture(irradianceMap, normalW).rgb;
+	vec3 ambient = vec3(0.03) * albedo;
 	vec3 color = ambient + Lo;
 
 	//color = color / (color + vec3(1.0));

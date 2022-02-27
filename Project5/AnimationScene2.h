@@ -6,6 +6,7 @@
 #include "GameScene.h"
 #include "Effect.h"
 #include "Character.h"
+#include "Ball.h"
 
 class AnimationScene2 : public GameScene
 {
@@ -18,10 +19,15 @@ private:
 	//Basic PBR shader
 	Shader m_basicPBRVertexShader;
 	Shader m_basicPBRFragShader;
+	//Basic PBR sphere shader
+	Shader m_basicPBRSphereVertexShader;
+	Shader m_basicPBRSphereFragShader;
 
 	//Effects
 	//Basic phong lighting effect
 	Effect m_basicPBREffect;
+	//Basic PBR sphere effect
+	Effect m_basicPBRSphereEffect;
 
 	//Lights
 	//Point light
@@ -32,6 +38,8 @@ private:
 	//GameObjects
 	//Character
 	Character m_militia;
+	Ball m_sphere;
+	
 
 	//Cameras
 	Camera m_camera;

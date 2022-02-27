@@ -12,6 +12,10 @@
 class GIScene : public GameScene
 {
 private:
+	unsigned int m_maxMipLevel = 5;
+
+	GLsizei m_prefilterResolution = 128;
+
 	GLsizei m_sceneWidth = 1920;
 	GLsizei m_sceneHeight = 1080;
 
@@ -26,6 +30,9 @@ private:
 	//Diffuse irradiance shader
 	Shader m_diffuseIrradianceVertexShader;
 	Shader m_diffuseIrradianceFragShader;
+	//Prefilter map shader
+	Shader m_prefilterMapVertexShader;
+	Shader m_prefilterMapFragShader;
 	//HDR sampler shader
 	Shader m_HDRSamplerVertexShader;
 	Shader m_HDRSamplerFragShader;
@@ -44,6 +51,8 @@ private:
 	Effect m_basicPBREffect;
 	//Diffuse Irradiance effect
 	Effect m_diffuseIrradianceEffect;
+	//Prefilter map effect
+	Effect m_prefilterMapEffect;
 	//HDR sampler effect
 	Effect m_HDRSamplerEffect;
 	//HDR environment map effect
@@ -88,6 +97,7 @@ private:
 	void SampleHDR();
 	void TransformCubeToDualPara();
 	void BakeIrradianceMap();
+	void BakePrefilteredMap();
 	void Bake();
 
 public:

@@ -31,6 +31,7 @@ protected:
 	RenderTexture m_renderTexture;
 	GLsizei m_width = 32;
 	GLsizei m_height = 32;
+	std::vector<GLuint> m_RBO;
 
 	// Frustum Property
 	GLfloat m_nearZ = 0.0f;
@@ -181,6 +182,11 @@ public:
 	bool getCameraViewState()
 	{
 		return m_thirdPersonViewState;
+	}
+
+	GLuint GetRBO(int index)
+	{
+		return m_RBO[index];
 	}
 };
 

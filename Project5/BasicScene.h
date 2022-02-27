@@ -7,7 +7,7 @@
 #include "Effect.h"
 #include "Skybox.h"
 #include "Ship.h"
-#include "Ocean.h"
+#include "Plane.h"
 #include "ParticleSystem.h"
 #include "Ball.h"
 
@@ -76,7 +76,7 @@ private:
 	//Hostile ship
 	Ship m_hostileShip;
 	//Ocean
-	Ocean m_ocean;
+	Plane m_ocean;
 	//Smoke
 	ParticleSystem m_smoke;
 	//Cannon balls

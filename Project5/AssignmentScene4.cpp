@@ -1,22 +1,16 @@
-#include "AnimationScene2.h"
+#include "AssignmentScene4.h"
 
-void AnimationScene2::Start()
+void AssignmentScene4::Start()
 {
 	//Load shaders
-	//Basic PBR shader
-	m_basicPBRVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\BasicPBRTangentAniVS.glsl");
-	m_basicPBRFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\BasicPBRTangentAniFS.glsl");
-	//Basic PBR sphere shader
-	m_basicPBRSphereVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\BasicPBRVS.glsl");
-	m_basicPBRSphereFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\BasicPBRFS.glsl");
+	//Texture debug shader
+	m_textureDebugVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\TextureDebugVS.glsl");
+	m_textureDebugFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\TextureDebugFS.glsl");
 
 	//Load effects
-	//Basic PBR effect
-	m_basicPBREffect.AddShader(&m_basicPBRVertexShader, &m_basicPBRFragShader);
-	m_basicPBREffect.BindShaders();
-
-	m_basicPBRSphereEffect.AddShader(&m_basicPBRSphereVertexShader, &m_basicPBRSphereFragShader);
-	m_basicPBRSphereEffect.BindShaders();
+	//Texture debug effect
+	m_textureDebugEffect.AddShader(&m_textureDebugVertexShader, &m_textureDebugFragShader);
+	m_textureDebugEffect.BindShaders();
 
 	//Load lights
 	//Directional light
@@ -26,21 +20,12 @@ void AnimationScene2::Start()
 	m_directLight.push_back(directLight);
 
 	//Load GameObjects
-	m_militia = Character(VertexPosNormalTangentTex, "Military_Male_03", "Military_Male_03.fbx", true);
-	m_militia.GetTransform().SetScale(vec3(0.02f, 0.02f, 0.02f));
-	//m_militia.GetTransform().SetRotation(vec3(glm::radians(-90.0f), 0.0f, 0.0f));
-	m_militia.GetTransform().SetPosition(vec3(0.0f, -2.0f, 0.0f));
-	m_militia.LoadPBRGameObject(vec3(-1.0f), -0.1f, 0.6f);
-	m_militia.InitiAnimation();
-	for (int i = 0; i < m_militia.GetMeshCount(); i++)
-		m_militia.SetMeshEffectWithIndex(&m_basicPBREffect, i);
-
-	//PBR material sphere
-	m_sphere = Ball(VertexPosNormalTex, 1.0f, 20.0f, 20.0f, vec4(1.0f), "PBRRustedIron");
-	m_sphere.GetTransform().SetPosition(vec3(0.0f, -2.0f, 0.0f));
-	m_sphere.GetTransform().SetScale(vec3(0.1f, 0.1f, 0.1f));
-	m_sphere.LoadPBRGameObject(vec3(1.0f), 0.1f, 0.1f);
-	m_sphere.SetMeshEffectWithIndex(&m_basicPBRSphereEffect, 0);
+	//Plane
+	m_plane = Plane(VertexPosTex, 1, 1);
+	m_plane.GetTransform().SetScale(vec3(100.0f, 100.0f, 100.0f));
+	m_plane.SetTextureScale(50.0f);
+	m_plane.LoadDebugObject(1024, 1024);
+	m_plane.SetMeshEffectWithIndex(&m_textureDebugEffect, 0);
 
 	//Camera
 
@@ -61,7 +46,7 @@ void AnimationScene2::Start()
 	m_camera.SetProjPerspective();
 }
 
-void AnimationScene2::InitiScene()
+void AssignmentScene4::InitiScene()
 {
 	//Initialize constant buffer
 
@@ -122,11 +107,10 @@ void AnimationScene2::InitiScene()
 
 	//Game object
 	//Load buffers of meshes
-	m_militia.InputAssemble();
-	m_sphere.InputAssemble();
+	m_plane.InputAssemble();
 }
 
-void AnimationScene2::RenderObjects()
+void AssignmentScene4::RenderObjects()
 {
 	//Set camera proj view
 	Effect::cbFrame.view = m_camera.GetView();
@@ -151,16 +135,15 @@ void AnimationScene2::RenderObjects()
 	glDepthMask(GL_TRUE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//Draw
-	m_sphere.DrawPBR();
-	m_militia.DrawPBR();
+	m_plane.DrawDebug();
 }
 
-void AnimationScene2::DisplayScene()
+void AssignmentScene4::DisplayScene()
 {
 	RenderObjects();
 }
 
-void AnimationScene2::UpdateScene()
+void AssignmentScene4::UpdateScene()
 {
 	m_curTime = glutGet(GLUT_ELAPSED_TIME);
 	float deltaTime = (m_curTime - m_preTime) * 0.001f;
@@ -176,45 +159,24 @@ void AnimationScene2::UpdateScene()
 	m_camera.LookAt(vec3(0.0f, 1.0f, 0.0f));
 	Effect::cbFrame.eyePos = m_camera.GetTransform().GetPosition();
 
-	//Update sphere location
-	/*if (keyboard.keyState.W)
+	//Change mip map state
+	if (keyboard.keyState.N && m_renderStateTimer > 0.5f)
 	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() + vec3(0.0f, 0.0f, 2.0f * deltaTime));
+		m_renderStateTimer = 0.0f;
+		m_useMipMap = !m_useMipMap;
+		if (m_useMipMap)
+			glUniform1i(glGetUniformLocation(m_textureDebugEffect.getShaderProgramID(), "useMipMap"), 1);
+		else
+			glUniform1i(glGetUniformLocation(m_textureDebugEffect.getShaderProgramID(), "useMipMap"), 0);
 	}
-	if (keyboard.keyState.S)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() - vec3(0.0f, 0.0f, 2.0f * deltaTime));
-	}
-	if (keyboard.keyState.A)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() + vec3(2.0f * deltaTime, 0.0f, 0.0f));
-	}
-	if (keyboard.keyState.D)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() - vec3(2.0f * deltaTime, 0.0f, 0.0f));
-	}
-	if (keyboard.keyState.Q)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() + vec3(0.0f, 2.0f * deltaTime, 0.0f));
-	}
-	if (keyboard.keyState.E)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() - vec3(0.0f, 2.0f * deltaTime, 0.0f));
-	}*/
-	vec3 test = m_militia.GetWorldMatrix() * vec4(m_militia.m_animationVec[0].GetTarget(), 1.0f);
-		//* m_militia.m_animationVec[0].GetEffector()->GetFinalMatrix()
-		//* m_militia.m_animationVec[0].GetEffector()->GetOffsetMatrix();
-	m_sphere.GetTransform().SetPosition(test);
-
-
-	//Update animation
-	m_militia.UpdateAnimation(deltaTime, m_sphere.GetTransform().GetPosition());
+	m_renderStateTimer += deltaTime;
+	
 
 	//Update time
 	m_preTime = m_curTime;
 }
 
-void AnimationScene2::OnResize(int width, int height)
+void AssignmentScene4::OnResize(int width, int height)
 {
 	m_camera.SetAspect(width, height);
 	m_camera.SetFrustum(60.0f, m_camera.GetAspect(), 0.5f, 1000.0f);
@@ -222,4 +184,13 @@ void AnimationScene2::OnResize(int width, int height)
 
 	//Update constant buffer(change on resize)
 	Effect::cbResize.proj = m_camera.GetProj();
+}
+
+void AssignmentScene4::GUIDisplay()
+{
+	ImGui::Begin("Mip Map Manager");
+	ImGui::SetWindowSize(ImVec2((float)500, (float)100));
+	ImGui::Checkbox("Use mip map (Press N)", &m_useMipMap);
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::End();
 }

@@ -16,6 +16,7 @@
 #include "AssignmentScene1.h"
 #include "AssignmentScene2.h"
 #include "AssignmentScene3.h"
+#include "AssignmentScene4.h"
 #include "AnimationScene1.h"
 #include "AnimationScene2.h"
 #include "Mouse.h"
@@ -41,6 +42,9 @@ GameScene* assignmentScene2;
 //Assignment scene 3
 GameScene* assignmentScene3;
 
+//Assignment scene 4
+GameScene* assignmentScene4;
+
 //Animation assignment scene 1
 GameScene* animationScene1;
 
@@ -51,10 +55,6 @@ GameScene* animationScene2;
 Mouse mouse;
 //Keyboard
 Keyboard keyboard;
-
-//ImGui variables
-//Assignment3
-bool useNormalMaps = false;
 
 //ImGui functions
 void ImGuiDisplay();
@@ -114,9 +114,9 @@ int main(int argc, char** argv)
 	//basicScene->Start();
 	//basicScene->InitiScene();
 	
-	//giScene = new GIScene();
-	//giScene->Start();
-	//giScene->InitiScene();
+	giScene = new GIScene();
+	giScene->Start();
+	giScene->InitiScene();
 
 	//assignmentScene1 = new AssignmentScene1();
 	//assignmentScene1->Start();
@@ -126,9 +126,13 @@ int main(int argc, char** argv)
 	//assignmentScene2->Start();
 	//assignmentScene2->InitiScene();
 
-	assignmentScene3 = new AssignmentScene3();
-	assignmentScene3->Start();
-	assignmentScene3->InitiScene();
+	//assignmentScene3 = new AssignmentScene3();
+	//assignmentScene3->Start();
+	//assignmentScene3->InitiScene();
+
+	//assignmentScene4 = new AssignmentScene4();
+	//assignmentScene4->Start();
+	//assignmentScene4->InitiScene();
 
 	//animationScene1 = new AnimationScene1();
 	//animationScene1->Start();
@@ -175,10 +179,11 @@ void KeyUp(unsigned char key, int x, int y)
 void UpdataScene()
 {
 	//basicScene->UpdateScene();
-	//giScene->UpdateScene();
+	giScene->UpdateScene();
 	//assignmentScene1->UpdateScene();
 	//assignmentScene2->UpdateScene();
-	assignmentScene3->UpdateScene();
+	//assignmentScene3->UpdateScene();
+	//assignmentScene4->UpdateScene();
 	//animationScene1->UpdateScene();
 	//animationScene2->UpdateScene();
 }
@@ -196,10 +201,11 @@ void Display()
 
 
 	//basicScene->DisplayScene();
-	//giScene->DisplayScene();
+	giScene->DisplayScene();
 	//assignmentScene1->DisplayScene();
 	//assignmentScene2->DisplayScene();
-	assignmentScene3->DisplayScene();
+	//assignmentScene3->DisplayScene();
+	//assignmentScene4->DisplayScene();
 	//animationScene1->DisplayScene();
 	//animationScene2->DisplayScene();
 
@@ -211,7 +217,6 @@ void Display()
 
 void ImGuiDisplay()
 {
-	ImGui::Begin("Map Manager");                          // Create a window called "Hello, world!" and append into it.
-	ImGui::Checkbox("Normal Map", &useNormalMaps);      // Edit bools storing our window open/close state
-	ImGui::End();
+	//assignmentScene3->GUIDisplay();
+	//assignmentScene4->GUIDisplay();
 }

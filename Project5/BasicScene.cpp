@@ -167,7 +167,7 @@ void BasicScene::Start()
 	m_skybox.SetMeshEffectWithIndex(&m_skyboxEffect, 0);
 
 	//Ocean
-	m_ocean = Ocean(VertexPosNormalTangentTex, 1000, 1000);
+	m_ocean = Plane(VertexPosNormalTangentTex, 1000, 1000);
 	m_ocean.GetTransform().SetScale(vec3(2.0f, 2.0f, 2.0f));
 	m_ocean.LoadGameObject(1024, 1024);
 	m_ocean.SetMeshEffectWithIndex(&m_oceanEffect, 0);

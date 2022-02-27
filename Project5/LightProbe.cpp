@@ -88,9 +88,9 @@ void LightProbe::GenerateDualParaMap(GLsizei& width, GLsizei& height, MeshData* 
     }
 }
 
-void LightProbe::LoadLightProbe(GLsizei width, GLsizei height)
+void LightProbe::LoadLightProbe(GLsizei irrWidth, GLsizei irrHeight, GLsizei prefilterSize)
 {
-    //Dual-paraboloid map
+    /*//Dual-paraboloid map
     //Check if the map is saved
     std::string MapPath = "../Project5\\Assets\\Precomputation\\Probe" + m_lightPorbeName + "\\DualParaboloidFront.hdr";
     FILE* f = std::fopen(MapPath.c_str(), "rb");
@@ -108,10 +108,13 @@ void LightProbe::LoadLightProbe(GLsizei width, GLsizei height)
     else
     {
         GenerateDualParaMap(width, height);
-    }
+    }*/
     
     //irradiance map
-    GenerateEmptyCubeMap(m_meshVec[0], width / 4, height / 4); //texture2
+    GenerateEmptyCubeMap(m_meshVec[0], irrWidth, irrHeight); //texture0, 2
+
+    //Prifilter map
+    GenerateEmptyCubeMap(m_meshVec[0], prefilterSize, prefilterSize, true); //texture0, 3
 }
 
 void LightProbe::SampleCube(float face)
@@ -138,8 +141,27 @@ void LightProbe::GenerateIrradianceMap(int numAzimuth, int numZenith)
     //Bind effect
     m_meshVec[0].m_pEffect->BindEffect();
     //Update uniform value
-    glUniform1i(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "numAzimuth"), 10);
-    glUniform1i(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "numZenith"), 10);
+    glUniform1i(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "numAzimuth"), numAzimuth);
+    glUniform1i(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "numZenith"), numZenith);
+    //Bind cube map
+    std::vector<GLuint> texIDVec;
+    std::vector<const char*> texParaNameVec;
+    std::vector<GLenum> texTarget;
+    texIDVec.push_back(m_meshVec[0].m_TextureVec[1].texID);
+    texParaNameVec.push_back("environmentMap");
+    texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+    m_meshVec[0].m_pEffect->BindTexture(texIDVec, texParaNameVec, texTarget);
+
+    m_meshVec[0].BindVertexArray();
+    glDrawElements(GL_TRIANGLES, m_meshVec[0].m_indexVec.size(), GL_UNSIGNED_INT, 0);
+}
+
+void LightProbe::Prefilter(float roughness)
+{
+    //Bind effect
+    m_meshVec[0].m_pEffect->BindEffect();
+    //Update uniform value
+    glUniform1i(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "roughness"), roughness);
     //Bind cube map
     std::vector<GLuint> texIDVec;
     std::vector<const char*> texParaNameVec;

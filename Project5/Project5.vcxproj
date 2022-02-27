@@ -162,11 +162,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AirPlane.cpp" />
+    <ClCompile Include="AnimationIK.cpp" />
     <ClCompile Include="AnimationScene1.cpp" />
     <ClCompile Include="AnimationScene2.cpp" />
     <ClCompile Include="AssignmentScene1.cpp" />
     <ClCompile Include="AssignmentScene2.cpp" />
     <ClCompile Include="AssignmentScene3.cpp" />
+    <ClCompile Include="AssignmentScene4.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="BasicScene.cpp" />
@@ -185,7 +187,9 @@
     <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="LightProbe.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Ocean.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Ship.cpp" />
@@ -195,11 +199,13 @@
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimationIK.h" />
     <ClInclude Include="AnimationScene1.h" />
     <ClInclude Include="AnimationScene2.h" />
     <ClInclude Include="AssignmentScene1.h" />
     <ClInclude Include="AssignmentScene2.h" />
     <ClInclude Include="AssignmentScene3.h" />
+    <ClInclude Include="AssignmentScene4.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="BasicScene.h" />
@@ -223,7 +229,8 @@
     <ClInclude Include="LightProbe.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Mouse.h" />
-    <ClInclude Include="Ocean.h" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="AirPlane.h" />
     <ClInclude Include="RenderTexture.h" />
@@ -242,6 +249,8 @@
     <None Include="Assets\Shaders\BasicPBRFS.glsl" />
     <None Include="Assets\Shaders\BasicPBRNoTexFS.glsl" />
     <None Include="Assets\Shaders\BasicPBRNoTexVS.glsl" />
+    <None Include="Assets\Shaders\BasicPBRTangentAniFS.glsl" />
+    <None Include="Assets\Shaders\BasicPBRTangentAniVS.glsl" />
     <None Include="Assets\Shaders\BasicPBRTangentFS.glsl" />
     <None Include="Assets\Shaders\BasicPBRTangentVS.glsl" />
     <None Include="Assets\Shaders\BasicPBRVS.glsl" />
@@ -264,6 +273,8 @@
     <None Include="Assets\Shaders\OutlineVS.glsl" />
     <None Include="Assets\Shaders\PerfectSurfaceFS.glsl" />
     <None Include="Assets\Shaders\PerfectSurfaceVS.glsl" />
+    <None Include="Assets\Shaders\PrefilterMapFS.glsl" />
+    <None Include="Assets\Shaders\PrefilterMapVS.glsl" />
     <None Include="Assets\Shaders\ShipFS.glsl" />
     <None Include="Assets\Shaders\ShipVS.glsl" />
     <None Include="Assets\Shaders\SkyboxFS.glsl" />
@@ -273,6 +284,8 @@
     <None Include="Assets\Shaders\SmokeRenderVS.glsl" />
     <None Include="Assets\Shaders\SmokeUpdateGS.glsl" />
     <None Include="Assets\Shaders\SmokeUpdateVS.glsl" />
+    <None Include="Assets\Shaders\TextureDebugFS.glsl" />
+    <None Include="Assets\Shaders\TextureDebugVS.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

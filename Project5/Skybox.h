@@ -12,7 +12,7 @@ protected:
 	void GenerateCube(MeshData& skyboxMesh);
 	void SetCubeMap(std::string skyboxName, std::string textureFormat, MeshData& skyboxMesh);
 	void LoadHDR(MeshData& skyboxMesh);
-	void GenerateEmptyCubeMap(MeshData& skyboxMesh, GLsizei width, GLsizei height);
+	void GenerateEmptyCubeMap(MeshData& skyboxMesh, GLsizei width, GLsizei height, bool mip = false);
 
 public:
 	Skybox() = default;

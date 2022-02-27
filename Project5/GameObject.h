@@ -10,6 +10,8 @@
 #include <stb_image.h>
 #include <string>
 #include "Mesh.h"
+#include "Node.h"
+#include "AnimationIK.h"
 #include "Transform.h"
 #include "Camera.h"
 
@@ -22,7 +24,7 @@ private:
 	Transform m_transform;
 
 	//This function will load mesh from the aiScene by recursively calling itself, all the meshes of this object can be loaded by calling this function with root node
-	void LoadMeshFromScene(const aiNode* pCurrentNode, const aiScene* pAIScene, std::string textureDir);
+	void LoadMeshFromScene(const aiNode* pCurrentNode, const aiScene* pAIScene, std::string textureDir, Node* node);
 
 	//This function will load mesh data into mesh vector which index matches the index in the scene
 	void LoadMeshData(const aiMesh* pMesh, unsigned int index, const aiScene* pAIScene, std::string textureDir);
@@ -30,11 +32,29 @@ private:
 	//This function will load mesh texture into mesh's texture vector
 	void LoadMeshTexture(aiMaterial* mat, aiTextureType type, std::string typeName, unsigned int index, std::string textureDir);
 
+	void GetNodeNum(const aiNode* pCurrentNode);
+
 protected:
 	//Vertex
 	std::vector<MeshData> m_meshVec;
 	GLuint m_verticesCount = 0;
 	VertexType m_type;
+	bool m_hasBone;
+
+	//Node for animation
+	std::vector<Node> m_nodeTree;
+	Node* m_rootNode = nullptr;
+	int m_nodeNum = 0;
+	int m_nodeCount = 0;
+	std::map<std::string, Node*> m_nameNodeMap;
+	std::map<int, Node*> m_indexNodeMap;
+
+	//Bone
+	std::map<std::string, GLuint> m_boneNameIndexMap;
+	std::vector<mat4> m_boneOffsetTransform;
+
+	//Animation
+	//std::vector<AnimationIK> m_animationVec;
 
 	//ShadowMap
 	GLuint m_shadowMapID;
@@ -46,12 +66,15 @@ protected:
 	void SetUpTextureMapFromFile(const std::string directory, bool mipmap, Texture* pTexture, GLint texClamp = GL_REPEAT, int* pNumColorChannels = NULL);
 
 public:
+	//Animation
+	std::vector<AnimationIK> m_animationVec;
 	GameObject() = default;
 
 	//Assemble the input data into GPU
 	void InputAssemble();
 	void InputAssemble(int index);
 
+	void virtual InitiAnimation() {}
 	void virtual LoadGameObject() {}
 	void virtual Draw() {}
 
@@ -109,6 +132,11 @@ public:
 	void SetShadowMap(GLuint texID)
 	{
 		m_shadowMapID = texID;
+	}
+
+	void ResetVertexType(VertexType type, int index)
+	{
+		m_meshVec[index].SetVertexType(type);
 	}
 };
 #endif

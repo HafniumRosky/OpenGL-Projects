@@ -26,6 +26,7 @@ public:
 	void virtual DisplayScene() {}
 	void virtual UpdateScene() {}
 	void virtual OnResize(int width, int height) {}
+	void virtual GUIDisplay() {}
 };
 
 #endif

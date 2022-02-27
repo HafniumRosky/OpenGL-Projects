@@ -67,6 +67,9 @@
     <Filter Include="UtilitiesHeader\ImGui">
       <UniqueIdentifier>{0f7202c4-8a36-4648-8cc0-680ce26c3efc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\TextureDebug">
+      <UniqueIdentifier>{696978ed-cf5e-4a0a-871f-1dca4558d7e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -84,9 +87,6 @@
     <ClCompile Include="Transform.cpp">
       <Filter>SceneObject</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>SceneObject</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>SceneObject</Filter>
     </ClCompile>
@@ -97,9 +97,6 @@
       <Filter>GameObjects</Filter>
     </ClCompile>
     <ClCompile Include="Skybox.cpp">
-      <Filter>GameObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="Ocean.cpp">
       <Filter>GameObjects</Filter>
     </ClCompile>
     <ClCompile Include="ParticleSystem.cpp">
@@ -165,6 +162,24 @@
     <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
       <Filter>UtilitiesSource\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationIK.cpp">
+      <Filter>SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="AssignmentScene4.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Effect.h">
@@ -185,9 +200,6 @@
     <ClInclude Include="Transform.h">
       <Filter>SceneObject</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>SceneObject</Filter>
-    </ClInclude>
     <ClInclude Include="Keyboard.h">
       <Filter>UtilitiesHeader</Filter>
     </ClInclude>
@@ -204,9 +216,6 @@
       <Filter>GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="Skybox.h">
-      <Filter>GameObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="Ocean.h">
       <Filter>GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="RenderTexture.h">
@@ -280,6 +289,21 @@
     </ClInclude>
     <ClInclude Include="imgui\imgui_impl_opengl3_loader.h">
       <Filter>UtilitiesHeader\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationIK.h">
+      <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="AssignmentScene4.h">
+      <Filter>Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -396,6 +420,24 @@
     </None>
     <None Include="Assets\Shaders\BasicPBRTangentVS.glsl">
       <Filter>Shader\PBR\BasicPBR</Filter>
+    </None>
+    <None Include="Assets\Shaders\TextureDebugFS.glsl">
+      <Filter>Shader\TextureDebug</Filter>
+    </None>
+    <None Include="Assets\Shaders\TextureDebugVS.glsl">
+      <Filter>Shader\TextureDebug</Filter>
+    </None>
+    <None Include="Assets\Shaders\BasicPBRTangentAniFS.glsl">
+      <Filter>Shader\PBR\BasicPBR</Filter>
+    </None>
+    <None Include="Assets\Shaders\BasicPBRTangentAniVS.glsl">
+      <Filter>Shader\PBR\BasicPBR</Filter>
+    </None>
+    <None Include="Assets\Shaders\PrefilterMapFS.glsl">
+      <Filter>Shader\LightProbe</Filter>
+    </None>
+    <None Include="Assets\Shaders\PrefilterMapVS.glsl">
+      <Filter>Shader\LightProbe</Filter>
     </None>
   </ItemGroup>
 </Project>

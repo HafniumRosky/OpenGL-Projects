@@ -22,6 +22,11 @@ vec3 Transform::GetPosition() const
 	return m_position;
 }
 
+quat Transform::GetQuaternion() const
+{
+	return m_quat;
+}
+
 mat4 Transform::GetLoaclToWorldMatrix() const
 {
 	return this->m_worldMatrix;
@@ -103,6 +108,12 @@ void Transform::SetPosition(GLfloat x, GLfloat y, GLfloat z)
 {
 	m_position = vec3(x, y, z);
 }
+
+void Transform::SetQuaternion(quat quaternion)
+{
+	m_quat = quaternion;
+}
+
 
 mat4 Transform::LookAt(const vec3& target, const vec3& up)
 {

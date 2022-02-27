@@ -168,6 +168,11 @@ void Ball::DrawPBR()
 	texTarget.push_back(GL_TEXTURE_2D);
 	texTarget.push_back(GL_TEXTURE_2D);
 	texTarget.push_back(GL_TEXTURE_2D);
+	//test
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[3].texID);
+	texParaNameVec.push_back("irradianceMap");
+	texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+
 	if (m_loadNormal)
 	{
 		texIDVec.push_back(m_meshVec[0].m_TextureVec[3].texID);

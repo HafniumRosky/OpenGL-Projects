@@ -55,10 +55,11 @@ void Camera::BindDepthBufferWithTexToFBO(RenderTexture rt, int index)
 void Camera::BindFBOWithRenderBuffer(GLsizei width, GLsizei height, int index)
 {
 	BindFBO(index);
-	unsigned int captureRBO;
-	glGenRenderbuffers(1, &captureRBO);
+	unsigned int RBO;
+	glGenRenderbuffers(1, &RBO);
+	m_RBO.push_back(RBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

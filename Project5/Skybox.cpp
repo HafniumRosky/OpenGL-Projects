@@ -170,7 +170,7 @@ void Skybox::LoadHDR(MeshData& skyboxMesh)
     }
 }
 
-void Skybox::GenerateEmptyCubeMap(MeshData& skyboxMesh, GLsizei width, GLsizei height)
+void Skybox::GenerateEmptyCubeMap(MeshData& skyboxMesh, GLsizei width, GLsizei height, bool mip)
 {
     Texture envCubeMap;
     glGenTextures(1, &envCubeMap.texID);
@@ -184,7 +184,10 @@ void Skybox::GenerateEmptyCubeMap(MeshData& skyboxMesh, GLsizei width, GLsizei h
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    if(mip)
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    else
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     skyboxMesh.m_TextureVec.push_back(envCubeMap);
 }

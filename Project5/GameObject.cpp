@@ -14,11 +14,40 @@ void GameObject::LoadGameObjectFromFile(std::string path, std::string textureDir
 	//Resize the vectors of the properties
 	this->m_meshVec.resize(pAIScene->mNumMeshes);
 	for (int i = 0; i < m_meshVec.size(); i++)
-		m_meshVec[i].SetVertexType(m_type);
-	LoadMeshFromScene(pAIScene->mRootNode, pAIScene, textureDir);
+		m_meshVec[i].SetVertexType(m_type, m_hasBone);
+
+	//Get the number of node
+	m_nodeNum = 1;
+	GetNodeNum(pAIScene->mRootNode);
+	m_nodeTree.resize(m_nodeNum);
+
+	//Set root node
+	Node rootNode;
+	rootNode.SetIndex(-2);
+	rootNode.SetNodeToParentTransform(pAIScene->mRootNode->mTransformation.Inverse());
+	//rootNode.GetFinalTransform().SetPosition(rootNode.GetNodeToParentTransform() * vec4(vec3(0.0f), 1.0f));
+	//rootNode.GetFinalTransform().m_quat = quat_cast(rootNode.GetNodeToParentTransform());
+	//rootNode.SetFinalMatrix(rootNode.GetNodeToParentTransform() * glm::translate(mat4(1), rootNode.GetFinalTransform().GetPosition()) * mat4_cast(rootNode.GetFinalTransform().m_quat));
+	rootNode.SetFinalMatrix(rootNode.GetNodeToParentTransform());
+	std::string nodeName = pAIScene->mRootNode->mName.data;
+	rootNode.SetName(nodeName);
+	m_nodeTree[0] = rootNode;
+	m_rootNode = &m_nodeTree[0];
+	m_nameNodeMap.insert(make_pair(nodeName, &m_nodeTree[0]));
+	//m_nameNodeMap[nodeName] = &m_nodeTree[0];
+	m_nodeCount = 1;
+	LoadMeshFromScene(pAIScene->mRootNode, pAIScene, textureDir, &m_nodeTree[0]);
 }
 
-void GameObject::LoadMeshFromScene(const aiNode* pCurrentNode, const aiScene* pAIScene, std::string textureDir)
+void GameObject::GetNodeNum(const aiNode* pCurrentNode)
+{
+	int num = pCurrentNode->mNumChildren;
+	m_nodeNum += num;
+	for (unsigned int i = 0; i < pCurrentNode->mNumChildren; i++)
+		GetNodeNum(pCurrentNode->mChildren[i]);
+}
+
+void GameObject::LoadMeshFromScene(const aiNode* pCurrentNode, const aiScene* pAIScene, std::string textureDir, Node* node)
 {
 	//load meshes in the current node
 	for (unsigned int i = 0; i < pCurrentNode->mNumMeshes; i++)
@@ -27,10 +56,28 @@ void GameObject::LoadMeshFromScene(const aiNode* pCurrentNode, const aiScene* pA
 		this->LoadMeshData(pMesh, pCurrentNode->mMeshes[i], pAIScene, textureDir);
 	}
 
+	node->ResizeChildren(pCurrentNode->mNumChildren);
 	//Load meshes in children nodes
 	for (unsigned int i = 0; i < pCurrentNode->mNumChildren; i++)
 	{
-		this->LoadMeshFromScene(pCurrentNode->mChildren[i], pAIScene, textureDir);
+		Node childNode;
+		unsigned int childIndex = m_nodeCount;
+		childNode.SetIndex(-1);
+		childNode.SetNodeToParentTransform(pCurrentNode->mChildren[i]->mTransformation);
+		childNode.SetParent(node);
+		//childNode.GetFinalTransform().SetPosition(glm::translate(mat4(1), node->GetFinalTransform().GetPosition()) * mat4_cast(node->GetFinalTransform().GetQuaternion()) * childNode.GetNodeToParentTransform() * vec4(vec3(0.0f), 1.0f));
+		//childNode.GetFinalTransform().m_quat = node->GetFinalTransform().m_quat * childNode.GetSelfTransform().m_quat;
+		childNode.SetFinalMatrix(node->GetFinalMatrix() * childNode.GetNodeToParentTransform());
+		//childNode.SetFinalMatrix(glm::translate(mat4(1), childNode.GetFinalTransform().GetPosition()) * mat4_cast(childNode.GetFinalTransform().m_quat));
+		std::string nodeName = pCurrentNode->mChildren[i]->mName.data;
+		childNode.SetName(nodeName);
+		m_nodeTree[m_nodeCount] = childNode;
+		m_nodeCount++;
+		m_nameNodeMap.insert(make_pair(nodeName, &m_nodeTree[childIndex]));
+		//m_nameNodeMap[nodeName] = &m_nodeTree[childIndex];
+		node->AddChild(&m_nodeTree[childIndex]);
+		node->m_childrenCount++;
+		this->LoadMeshFromScene(pCurrentNode->mChildren[i], pAIScene, textureDir, &m_nodeTree[childIndex]);
 	}
 }
 
@@ -62,6 +109,14 @@ void GameObject::LoadMeshData(const aiMesh* pMesh, unsigned int index, const aiS
 			this->m_meshVec[index].m_color.push_back(vec4(pColor->r, pColor->g, pColor->b, pColor->a));
 		if (this->m_meshVec[index].m_dataState.tex)
 			this->m_meshVec[index].m_texcoord.push_back(vec2(pTexCoord->x, pTexCoord->y));
+
+		//Prepare bone data
+		if (pMesh->HasBones())
+		{
+			BoneData boneData;
+			this->m_meshVec[index].m_boneDataVec.push_back(boneData);
+			this->m_meshVec[index].m_boneNum.push_back(0);
+		}
 	}
 
 	//Load index data
@@ -97,6 +152,45 @@ void GameObject::LoadMeshData(const aiMesh* pMesh, unsigned int index, const aiS
 		LoadMeshTexture(pMaterial, aiTextureType_DIFFUSE, "diffuse", index, textureDir);
 		LoadMeshTexture(pMaterial, aiTextureType_NORMALS, "normal", index, textureDir);
 		LoadMeshTexture(pMaterial, aiTextureType_SPECULAR, "specular", index, textureDir);
+	}
+
+	//Load bones
+	if (pMesh->HasBones())
+	{
+		for (int i = 0; i < pMesh->mNumBones; i++)
+		{
+			//Add additional bones
+			unsigned int boneIndex = 0;
+			std::string boneName(pMesh->mBones[i]->mName.data);
+			//std::cout << boneName << std::endl;
+			if (m_boneNameIndexMap.find(boneName) == m_boneNameIndexMap.end())
+			{
+				boneIndex = m_boneOffsetTransform.size();
+				mat4 offsetTransform;
+				m_boneOffsetTransform.push_back(offsetTransform);
+				m_boneNameIndexMap[boneName] = boneIndex;
+			}
+			else
+				boneIndex = m_boneNameIndexMap[boneName];
+
+			//Load bone offset matrix
+			aiMatrix4x4 offsetMat = pMesh->mBones[i]->mOffsetMatrix;
+			m_boneOffsetTransform[boneIndex] =
+				mat4(offsetMat.a1, offsetMat.b1, offsetMat.c1, offsetMat.d1,
+					offsetMat.a2, offsetMat.b2, offsetMat.c2, offsetMat.d2,
+					offsetMat.a3, offsetMat.b3, offsetMat.c3, offsetMat.d3,
+					offsetMat.a4, offsetMat.b4, offsetMat.c4, offsetMat.d4);
+
+			//Load the bone into vertex data
+			for (int j = 0; j < pMesh->mBones[i]->mNumWeights; j++)
+			{
+				int vertexIndex = pMesh->mBones[i]->mWeights[j].mVertexId;
+				float weight = pMesh->mBones[i]->mWeights[j].mWeight;
+				m_meshVec[index].m_boneDataVec[vertexIndex].boneIndex[m_meshVec[index].m_boneNum[vertexIndex]] = boneIndex;
+				m_meshVec[index].m_boneDataVec[vertexIndex].boneWeight[m_meshVec[index].m_boneNum[vertexIndex]] = weight;
+				m_meshVec[index].m_boneNum[vertexIndex] += 1;
+			}
+		}
 	}
 }
 

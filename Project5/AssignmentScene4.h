@@ -1,37 +1,31 @@
-#ifndef ASSIGNMENTSCENE_3_H
-#define ASSIGNMENTSCENE_3_H
+#ifndef ASSIGNMENT_SCENE4_H
+#define ASSIGNMENT_SCENE4_H
 
 #include <GL/glew.h>
 #include <vector>
 #include "GameScene.h"
 #include "Effect.h"
-#include "Character.h"
+#include "Plane.h"
 #include "imgui.h"
 
-class AssignmentScene3 : public GameScene
+class AssignmentScene4 : public GameScene
 {
 private:
 	//Time
 	float m_curTime;
 	float m_preTime;
 
-	//GUI parameters
-	bool m_useNormalMaps = false;
-
 	float m_renderStateTimer = 0.0f;
+	bool m_useMipMap = false;
 
 	//Shaders
-	//Basic PBR shader with normal map
-	Shader m_basicPBRTanVertexShader;
-	Shader m_basicPBRTanFragShader;
-	//Basic PBR shader without normal map
-	Shader m_basicPBRVertexShader;
-	Shader m_basicPBRFragShader;
+	//Texture debug shader
+	Shader m_textureDebugVertexShader;
+	Shader m_textureDebugFragShader;
 
 	//Effects
-	//Basic PBR lighting effect
-	Effect m_basicPBRTanEffect;
-	Effect m_basicPBREffect;
+	//Texture debug effect
+	Effect m_textureDebugEffect;
 
 	//Lights
 	//Point light
@@ -40,8 +34,8 @@ private:
 	std::vector<DirectionalLight> m_directLight;
 
 	//GameObjects
-	//Character
-	Character m_militia;
+	//Plane
+	Plane m_plane;
 
 	//Cameras
 	Camera m_camera;
@@ -50,7 +44,7 @@ private:
 	void RenderObjects();
 
 public:
-	AssignmentScene3() {}
+	AssignmentScene4() {}
 	void Start();
 	void InitiScene();
 	void DisplayScene();

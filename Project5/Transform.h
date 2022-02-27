@@ -23,6 +23,7 @@ private:
 	mat4 m_worldInverseTransMatrix;
 
 public:
+	quat m_quat = quat(vec3(0.0f));
 	Transform() = default;
 	Transform(const vec3& scale, const vec3& rotation, const vec3& position);
 	~Transform() = default;
@@ -42,6 +43,9 @@ public:
 
 	// Get object position
 	vec3 GetPosition() const;
+
+	//Get quaternion
+	quat GetQuaternion() const;
 
 	// Get model to world matrix
 	mat4 GetLoaclToWorldMatrix() const;
@@ -77,6 +81,9 @@ public:
 	void SetPosition(const vec3& position);
 	// Set object position
 	void SetPosition(GLfloat x, GLfloat y, GLfloat z);
+
+	//Set quaternion
+	void SetQuaternion(quat quaternion);
 
 	//Rotate at certain position
 	void Rotate(float angle, vec3 direction);

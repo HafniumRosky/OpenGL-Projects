@@ -1,7 +1,5 @@
 #include "AssignmentScene3.h"
 
-extern bool useNormalMaps;
-
 void AssignmentScene3::Start()
 {
 	//Load shaders
@@ -30,7 +28,7 @@ void AssignmentScene3::Start()
 
 	//Load GameObjects
 	//Militia
-	m_militia = Character(VertexPosNormalTangentTex, "Military_Male_03", "Military_Male_03.fbx");
+	m_militia = Character(VertexPosNormalTangentTex, "Military_Male_03", "Military_Male_03.fbx", false);
 	m_militia.GetTransform().SetScale(vec3(0.02f, 0.02f, 0.02f));
 	m_militia.GetTransform().SetRotation(vec3(glm::radians(-90.0f), 0.0f, 0.0f));
 	m_militia.GetTransform().SetPosition(vec3(0.0f, -2.0f, 0.0f));
@@ -174,8 +172,8 @@ void AssignmentScene3::UpdateScene()
 	if (keyboard.keyState.N && m_renderStateTimer > 0.5f)
 	{
 		m_renderStateTimer = 0.0f;
-		useNormalMaps = !useNormalMaps;
-		if (useNormalMaps)
+		m_useNormalMaps = !m_useNormalMaps;
+		if (m_useNormalMaps)
 		{
 			for (int i = 0; i < m_militia.GetMeshCount(); i++)
 				m_militia.SetMeshEffectWithIndex(&m_basicPBRTanEffect, i);
@@ -204,4 +202,11 @@ void AssignmentScene3::OnResize(int width, int height)
 
 	//Update constant buffer(change on resize)
 	Effect::cbResize.proj = m_camera.GetProj();
+}
+
+void AssignmentScene3::GUIDisplay()
+{
+	ImGui::Begin("Map Manager"); 
+	ImGui::Checkbox("Normal Map", &m_useNormalMaps);
+	ImGui::End();
 }

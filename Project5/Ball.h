@@ -41,6 +41,12 @@ public:
 	void DrawPerfect(GLuint cubeTexID, int renderState, float* etas);
 	void Update(float dt);
 
+	//for test
+	void PushIrradianceMap(Texture irrTex)
+	{
+		m_meshVec[0].m_TextureVec.push_back(irrTex);
+	}
+
 	void SetDirection(vec3 dir)
 	{
 		m_direction = dir;

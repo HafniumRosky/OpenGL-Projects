@@ -16,21 +16,29 @@ float PI = 3.14159265359;
 
 void ComputeDiffuseIrradiance(out vec3 irradiance)
 {
+	vec3 facingDir = normalize(pIn.posL);
+	vec3 tangentUp = vec3(0.0, 1.0, 0.0);
+	vec3 tangentRight = normalize(cross(tangentUp, facingDir));
+	tangentUp = normalize(cross(facingDir, tangentRight));
+
 	float azimuthOffset = (PI * 2) / numAzimuth;
 	float zenithOffset = (PI * 2) / numZenith;
-	for(float i = 0; i < numAzimuth; i += azimuthOffset)
+	int sampleNum = 0;
+	for(float phi = 0; phi < 2.0 * PI; phi += azimuthOffset)
 	{
-		for(float j = 0; j < numZenith; j += zenithOffset)
+		for(float theta = 0; theta < 0.5 * PI; theta += zenithOffset)
 		{
-			vec3 sampleDir;
-			sampleDir.x = cos(azimuthOffset * i) * sin(zenithOffset * i);
-			sampleDir.y = sin(azimuthOffset * i) * sin(zenithOffset * i);
-			sampleDir.z = cos(zenithOffset * i);
-			sampleDir = normalize(sampleDir);
-			irradiance += texture(environmentMap, sampleDir).rgb * cos(zenithOffset * i) * sin(zenithOffset * i);
+			vec3 sampleDirTan;
+			sampleDirTan.x = cos(phi) * sin(theta);
+			sampleDirTan.y = sin(phi) * sin(theta);
+			sampleDirTan.z = cos(theta);
+			sampleDirTan = normalize(sampleDirTan);
+			vec3 sampleDir = sampleDirTan.x * tangentRight + sampleDirTan.y * tangentUp + sampleDirTan.z * facingDir;
+			irradiance += texture(environmentMap, sampleDir).rgb * cos(theta) * sin(theta);
+			sampleNum++;
 		}
 	}
-	irradiance *= (PI / (numAzimuth * numZenith));
+	irradiance *= (PI / float(sampleNum));
 }
 
 void main()

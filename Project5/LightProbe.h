@@ -27,9 +27,10 @@ public:
 		m_skyboxName = skyboxName;
 		m_isGlobal = isGlobal;
 	}
-	void LoadLightProbe(GLsizei width, GLsizei height);
+	void LoadLightProbe(GLsizei irrWidth, GLsizei irrHeight, GLsizei prefilterSize);
 	void SampleCube(float face);
 	void GenerateIrradianceMap(int numAzimuth, int numZenith);
+	void Prefilter(float roughness);
 
 	std::string getProbeName()
 	{

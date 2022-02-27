@@ -38,6 +38,12 @@ in vec3 posL;
 in vec3 normalL;
 in vec4 tangent;
 in vec2 texcoord;
+in ivec4 boneIndex;
+in vec4 boneWeight;
+
+const int MAX_BONES = 240;
+
+uniform mat4 boneFinal[MAX_BONES];
 
 out v2f
 {
@@ -49,11 +55,20 @@ out v2f
 
 void main()
 {
-	vec3 posW = vec3(world * vec4(posL,1.0));
+	mat4 boneAniTransform = boneFinal[boneIndex[0]] * boneWeight[0];
+	boneAniTransform += boneFinal[boneIndex[1]] * boneWeight[1];
+	boneAniTransform += boneFinal[boneIndex[2]] * boneWeight[2];
+	boneAniTransform += boneFinal[boneIndex[3]] * boneWeight[3];
+	//float test = boneWeight[0] + boneWeight[1] + boneWeight[2] + boneWeight[3];
+
+	//boneAniTransform = boneFinal[0];
+	vec4 posLB = boneAniTransform * vec4(posL,1.0);
+	vec4 normalLB = transpose(inverse(boneAniTransform)) * vec4(normalL, 1.0);
+	vec3 posW = vec3(world * posLB);
 	pOut.uv.xy = texcoord;
 	pOut.uv.zw = texcoord;
 
-	vec3 normalW = vec3(worldInvTranspose * vec4(normalL, 1.0));
+	vec3 normalW = vec3(worldInvTranspose * normalLB);
 	vec3 tangentW = vec3(world * vec4(tangent.xyz, 1.0));
 	vec3 biNormalW = cross(normalW, tangentW) * tangent.w;
 

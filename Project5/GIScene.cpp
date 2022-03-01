@@ -4,8 +4,8 @@ void GIScene::Start()
 {
 	//Load shaders
 	//Basic PBR shader
-	m_basicPBRVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\BasicPBRVS.glsl");
-	m_basicPBRFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\BasicPBRFS.glsl");
+	m_basicPBRVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\IBLVS.glsl");
+	m_basicPBRFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\IBLFS.glsl");
 	//Diffuse irradiance shader
 	m_diffuseIrradianceVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\BakeGIDiffVS.glsl");
 	m_diffuseIrradianceFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\BakeGIDiffFS.glsl");

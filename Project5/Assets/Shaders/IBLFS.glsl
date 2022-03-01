@@ -132,62 +132,25 @@ void main()
 	F0 = mix(F0, albedo, metallic);
 
 	vec3 Lo = vec3(0.0);
-	//Point light
-	for(int i = 0; i < numPointLight; i++)
-	{
-		vec3 lightVec = normalize(pointLight[i].position - pIn.posW);
-		vec3 halfVec = normalize(viewDir + lightVec);
-		float lightDistance = length(pointLight[i].position - pIn.posW);
-		float atten = 1.0 /(lightDistance, lightDistance);
-		vec3 radiance = pointLight[i].color.rgb * atten;
-		float NdotH = max(dot(normalW, halfVec), 0.0);
-		float HdotV = max(dot(halfVec, viewDir), 0.0);
-		float NdotV = max(dot(normalW, viewDir), 0.0);
-		float NdotL = max(dot(normalW, lightVec), 0.0);
-		float D = DistributionGGX(NdotH, roughness);
-		vec3 F = fresnelSchlick(HdotV, F0);
-		float G = GeometrySmith(NdotL, NdotV, roughness);
-		vec3 DFG = D * F * G;
-		float denominator = 4.0 * NdotV * NdotL  + 0.0001;
-		vec3 specular = DFG / denominator;
-		
-		vec3 ks = FresnelSchlickRoughness(NdotV, F0, roughness); ;
-		vec3 kd = vec3(1.0) - ks;
-		kd *= 1.0 - metallic;
-		Lo += (kd * albedo / PI + ks * specular) * radiance * NdotL;
-		//Lo += (ks * specular) * radiance * NdotL + kd * albedo * texture(irradianceMap, normalW).rgb;
-	}
-	//Analytical light
-	for(int i = 0; i < numDirLight; i++)
-	{
-		vec3 lightVec = normalize(-dirLight[i].direction);
-		vec3 halfVec = normalize(viewDir + lightVec);
-		vec3 radiance = dirLight[i].color.rgb;
-		float NdotH = max(dot(normalW, halfVec), 0.0);
-		float HdotV = max(dot(halfVec, viewDir), 0.0);
-		float NdotV = max(dot(normalW, viewDir), 0.0);
-		float NdotL = max(dot(normalW, lightVec), 0.0);
-		float D = DistributionGGX(NdotH, roughness);
-		vec3 F = fresnelSchlick(HdotV, F0);
-		float G = GeometrySmith(NdotL, NdotV, roughness);
-		vec3 DFG = D * F * G;
-		float denominator = 4.0 * NdotV * NdotL  + 0.0001;
-		vec3 specular = DFG / denominator;
-		
-		vec3 ks = F;
-		vec3 kd = vec3(1.0) - ks;
-		kd *= 1.0 - metallic;
-		Lo += (kd * albedo / PI + ks * specular) * radiance * NdotL;
-	}
-	
 
+	vec3 R = reflect(-viewDir, normalW);
+	const float MAX_REFLECTION_LOD = 4.0;
+	vec3 prefilteredColor = textureLod(prefilteredMap, R,  roughness * MAX_REFLECTION_LOD).rgb;  
 
+	float NdotV = max(dot(normalW, viewDir), 0.0);
+	vec3 F = FresnelSchlickRoughness(NdotV, F0, roughness);
+	vec2 envBRDF = texture(BRDFLUT, vec2(NdotV, roughness)).rg;
+	vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
-	vec3 ambient = vec3(0.3) * albedo * texture(irradianceMap, normalW).rgb;
-	vec3 color = ambient + Lo;
+	vec3 kS = F;
+	vec3 kD = 1.0 - kS;
+	kD *= 1.0 - metallic;	  
+  
+	vec3 irradiance = texture(irradianceMap, normalW).rgb;
+	vec3 diffuse = irradiance * albedo;
 
-	//color = color / (color + vec3(1.0));
+	Lo = kS * specular + kD * diffuse;
+	vec3 color = Lo;
 	color = pow(color, vec3(1.0/2.2)); 
-
 	FragColor = vec4(color, 1.0);
 }

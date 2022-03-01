@@ -1,14 +1,10 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(491,5): warning MSB8028: 中间目录(Release\)包含从另一个项目(Project5.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。
-  GIScene.cpp
-C:\Users\69494\source\repos\Project5\Project5\GIScene.cpp(75,64): warning C4244: “参数”: 从“float”转换到“unsigned int”，可能丢失数据
-C:\Users\69494\source\repos\Project5\Project5\GIScene.cpp(75,57): warning C4244: “参数”: 从“float”转换到“unsigned int”，可能丢失数据
-C:\Users\69494\source\repos\Project5\Project5\GIScene.cpp(346,30): warning C4244: “初始化”: 从“double”转换到“unsigned int”，可能丢失数据
-C:\Users\69494\source\repos\Project5\Project5\GIScene.cpp(483,20): warning C4018: “<”: 有符号/无符号不匹配
-C:\Users\69494\source\repos\Project5\Project5\GIScene.cpp(486,20): warning C4018: “<”: 有符号/无符号不匹配
-C:\Users\69494\source\repos\Project5\Project5\GIScene.cpp(565,21): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+  AnimationScene3.cpp
+C:\Users\69494\source\repos\Project5\Project5\AnimationScene3.cpp(83,20): warning C4018: “<”: 有符号/无符号不匹配
+C:\Users\69494\source\repos\Project5\Project5\AnimationScene3.cpp(86,20): warning C4018: “<”: 有符号/无符号不匹配
   正在生成代码
-  1 of 2908 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  0 of 2908 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    22 functions had inline decision re-evaluated but remain unchanged
+    28 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   Project5.vcxproj -> C:\Users\69494\source\repos\Project5\Release\CGProject.exe

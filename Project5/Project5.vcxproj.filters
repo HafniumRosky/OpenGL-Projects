@@ -70,6 +70,9 @@
     <Filter Include="Shader\TextureDebug">
       <UniqueIdentifier>{696978ed-cf5e-4a0a-871f-1dca4558d7e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\PBR\IBL">
+      <UniqueIdentifier>{2d458ba7-3cc3-4e43-a4a2-a394085d9035}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -178,6 +181,9 @@
       <Filter>GameObjects</Filter>
     </ClCompile>
     <ClCompile Include="AssignmentScene4.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationScene3.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
   </ItemGroup>
@@ -303,6 +309,9 @@
       <Filter>GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="AssignmentScene4.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationScene3.h">
       <Filter>Scenes</Filter>
     </ClInclude>
   </ItemGroup>
@@ -444,6 +453,12 @@
     </None>
     <None Include="Assets\Shaders\IntegrateBRDFVS.glsl">
       <Filter>Shader\LightProbe</Filter>
+    </None>
+    <None Include="Assets\Shaders\IBLFS.glsl">
+      <Filter>Shader\PBR\IBL</Filter>
+    </None>
+    <None Include="Assets\Shaders\IBLVS.glsl">
+      <Filter>Shader\PBR\IBL</Filter>
     </None>
   </ItemGroup>
 </Project>

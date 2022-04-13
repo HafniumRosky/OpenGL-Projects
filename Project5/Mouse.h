@@ -22,6 +22,7 @@ public:
 	struct State
 	{
 		bool    leftButton;
+		bool	leftButtonHold;
 		bool    middleButton;
 		bool    rightButton;
 		bool    xButton1;
@@ -54,12 +55,25 @@ public:
 		ButtonState xButton2;
 	};
 
-	void initMouse()
+	void initMouseNoCursor()
 	{
 		m_mouseState.positionMode = ChangeMode::MODE_RELATIVE;
 		m_mouseState.x = 960;
 		m_mouseState.y = 540;
+		m_mouseState.deltaX = 0;
+		m_mouseState.deltaY = 0;
 		glutSetCursor(GLUT_CURSOR_NONE);
+		glutWarpPointer(m_mouseState.x, m_mouseState.y);
+	}
+
+	void initMouseCursor()
+	{
+		m_mouseState.positionMode = ChangeMode::MODE_RELATIVE;
+		m_mouseState.x = 960;
+		m_mouseState.y = 540;
+		m_mouseState.deltaX = 0;
+		m_mouseState.deltaY = 0;
+		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
 		glutWarpPointer(m_mouseState.x, m_mouseState.y);
 	}
 
@@ -71,6 +85,14 @@ public:
 			m_mouseState.deltaX = x - m_mouseState.x;
 			m_mouseState.deltaY = y - m_mouseState.y;
 		}
+	}
+
+	void MouseMotionChangePos(int x, int y)
+	{
+		m_mouseState.deltaX = x - m_mouseState.x;
+		m_mouseState.deltaY = y - m_mouseState.y;
+		m_mouseState.x = x;
+		m_mouseState.y = y;
 	}
 
 	void MouseFunction(int button, int state, int x, int y)

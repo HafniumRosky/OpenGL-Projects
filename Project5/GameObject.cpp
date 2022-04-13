@@ -1,6 +1,6 @@
 #include "GameObject.h"
 
-void GameObject::LoadGameObjectFromFile(std::string path, std::string textureDir)
+void GameObject::LoadGameObjectFromFile(std::string path, std::string textureDir, int existingMeshNum)
 {
 	Assimp::Importer importer;
 	const aiScene* pAIScene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
@@ -12,8 +12,9 @@ void GameObject::LoadGameObjectFromFile(std::string path, std::string textureDir
 		return;
 	}
 	//Resize the vectors of the properties
-	this->m_meshVec.resize(pAIScene->mNumMeshes);
-	for (int i = 0; i < m_meshVec.size(); i++)
+	m_existMeshNum = existingMeshNum;
+	this->m_meshVec.resize(pAIScene->mNumMeshes + existingMeshNum);
+	for (int i = existingMeshNum; i < m_meshVec.size(); i++)
 		m_meshVec[i].SetVertexType(m_type, m_hasBone);
 
 	//Get the number of node
@@ -87,7 +88,12 @@ void GameObject::LoadMeshData(const aiMesh* pMesh, unsigned int index, const aiS
 	//In case we don't have the matching data
 	const aiVector3D zeroVec(0.0f, 0.0f, 0.0f);
 	const aiColor4D black(0.0f, 0.0f, 0.0f, 0.0f);
-	this->m_meshVec[index].m_name = pMesh->mName.C_Str();
+	unsigned int meshIndex;
+	if (m_existMeshNum == 0)
+		meshIndex = index;
+	else
+		meshIndex = m_existMeshNum;
+	this->m_meshVec[meshIndex].m_name = pMesh->mName.C_Str();
 	//Load vertex data
 	for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
 	{
@@ -99,23 +105,23 @@ void GameObject::LoadMeshData(const aiMesh* pMesh, unsigned int index, const aiS
 		const aiVector3D* pTexCoord = pMesh->HasTextureCoords(0) ? &(pMesh->mTextureCoords[0][i]) : &zeroVec;
 
 		//Load model position
-		this->m_meshVec[index].m_posL.push_back(vec3(pPos->x, pPos->y, pPos->z));
+		this->m_meshVec[meshIndex].m_posL.push_back(vec3(pPos->x, pPos->y, pPos->z));
 		//Load model normal
-		if(this->m_meshVec[index].m_dataState.normal)
-			this->m_meshVec[index].m_normalL.push_back(vec3(pNormal->x, pNormal->y, pNormal->z));
-		if(this->m_meshVec[index].m_dataState.tangent)
-			this->m_meshVec[index].m_tangent.push_back(vec4(pTangent->x, pTangent->y, pTangent->z, 1.0f));
-		if (this->m_meshVec[index].m_dataState.color)
-			this->m_meshVec[index].m_color.push_back(vec4(pColor->r, pColor->g, pColor->b, pColor->a));
-		if (this->m_meshVec[index].m_dataState.tex)
-			this->m_meshVec[index].m_texcoord.push_back(vec2(pTexCoord->x, pTexCoord->y));
+		if(this->m_meshVec[meshIndex].m_dataState.normal)
+			this->m_meshVec[meshIndex].m_normalL.push_back(vec3(pNormal->x, pNormal->y, pNormal->z));
+		if(this->m_meshVec[meshIndex].m_dataState.tangent)
+			this->m_meshVec[meshIndex].m_tangent.push_back(vec4(pTangent->x, pTangent->y, pTangent->z, 1.0f));
+		if (this->m_meshVec[meshIndex].m_dataState.color)
+			this->m_meshVec[meshIndex].m_color.push_back(vec4(pColor->r, pColor->g, pColor->b, pColor->a));
+		if (this->m_meshVec[meshIndex].m_dataState.tex)
+			this->m_meshVec[meshIndex].m_texcoord.push_back(vec2(pTexCoord->x, pTexCoord->y));
 
 		//Prepare bone data
 		if (pMesh->HasBones())
 		{
 			BoneData boneData;
-			this->m_meshVec[index].m_boneDataVec.push_back(boneData);
-			this->m_meshVec[index].m_boneNum.push_back(0);
+			this->m_meshVec[meshIndex].m_boneDataVec.push_back(boneData);
+			this->m_meshVec[meshIndex].m_boneNum.push_back(0);
 		}
 	}
 
@@ -128,7 +134,7 @@ void GameObject::LoadMeshData(const aiMesh* pMesh, unsigned int index, const aiS
 		assert(face.mNumIndices == 3);
 		for (unsigned int j = 0; j < face.mNumIndices; j++)
 		{
-			this->m_meshVec[index].m_indexVec.push_back(face.mIndices[j]);
+			this->m_meshVec[meshIndex].m_indexVec.push_back(face.mIndices[j]);
 		}
 	}
 	//Accumulate the number of vertices
@@ -140,14 +146,14 @@ void GameObject::LoadMeshData(const aiMesh* pMesh, unsigned int index, const aiS
 		aiMaterial* pMaterial = pAIScene->mMaterials[pMesh->mMaterialIndex];
 		aiColor3D color;
 		pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
-		m_meshVec[index].m_material.ambient = vec4(color.r, color.g, color.g, 1.0f);
+		m_meshVec[meshIndex].m_material.ambient = vec4(color.r, color.g, color.g, 1.0f);
 		pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-		m_meshVec[index].m_material.diffuse = vec4(color.r, color.g, color.g, 1.0f);
+		m_meshVec[meshIndex].m_material.diffuse = vec4(color.r, color.g, color.g, 1.0f);
 		pMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
-		m_meshVec[index].m_material.specular = vec4(color.r, color.g, color.g, 1.0f);
+		m_meshVec[meshIndex].m_material.specular = vec4(color.r, color.g, color.g, 1.0f);
 		float gloss;
 		pMaterial->Get(AI_MATKEY_SHININESS, gloss);
-		m_meshVec[index].m_material.gloss = gloss;
+		m_meshVec[meshIndex].m_material.gloss = gloss;
 		//May add more types
 		LoadMeshTexture(pMaterial, aiTextureType_DIFFUSE, "diffuse", index, textureDir);
 		LoadMeshTexture(pMaterial, aiTextureType_NORMALS, "normal", index, textureDir);
@@ -186,9 +192,9 @@ void GameObject::LoadMeshData(const aiMesh* pMesh, unsigned int index, const aiS
 			{
 				int vertexIndex = pMesh->mBones[i]->mWeights[j].mVertexId;
 				float weight = pMesh->mBones[i]->mWeights[j].mWeight;
-				m_meshVec[index].m_boneDataVec[vertexIndex].boneIndex[m_meshVec[index].m_boneNum[vertexIndex]] = boneIndex;
-				m_meshVec[index].m_boneDataVec[vertexIndex].boneWeight[m_meshVec[index].m_boneNum[vertexIndex]] = weight;
-				m_meshVec[index].m_boneNum[vertexIndex] += 1;
+				m_meshVec[meshIndex].m_boneDataVec[vertexIndex].boneIndex[m_meshVec[meshIndex].m_boneNum[vertexIndex]] = boneIndex;
+				m_meshVec[meshIndex].m_boneDataVec[vertexIndex].boneWeight[m_meshVec[meshIndex].m_boneNum[vertexIndex]] = weight;
+				m_meshVec[meshIndex].m_boneNum[vertexIndex] += 1;
 			}
 		}
 	}
@@ -296,4 +302,51 @@ void GameObject::InputAssemble(int index)
 	m_meshVec[index].SetVertexBuffer();
 	m_meshVec[index].SetIndexBuffer();
 	m_meshVec[index].BindBuffers();
+}
+
+int GameObject::PickVertex(int meshIndex, vec2 pickPos, mat4 proj, mat4 view, std::vector<unsigned int>& indeices, vec3 viewDir)
+{
+	int shortestIndex = 0;;
+	m_transform.ComputeLocalToWorldMatrix();
+	vec4 clipPos = proj * view * m_transform.GetLoaclToWorldMatrix() * vec4(m_meshVec[meshIndex].m_posL[0], 1.0f);
+	vec2 screenPos = vec2(clipPos.x / clipPos.w, clipPos.y / clipPos.w);
+	float shortestDistance = glm::distance(pickPos, screenPos);
+	for (int i = 1; i < m_meshVec[meshIndex].m_posL.size(); i++)
+	{
+		clipPos = proj * view * m_transform.GetLoaclToWorldMatrix() * vec4(m_meshVec[meshIndex].m_posL[i], 1.0f);
+		screenPos = vec2(clipPos.x / clipPos.w, clipPos.y / clipPos.w);
+		float currDistance = glm::distance(pickPos, screenPos);
+		if (currDistance < shortestDistance)
+		{
+			if (!m_meshVec[meshIndex].m_dataState.normal)
+			{
+				shortestIndex = i;
+				shortestDistance = currDistance;
+			}
+			else
+			{
+				if (glm::dot(viewDir, vec3(glm::inverse(glm::transpose(m_transform.GetLoaclToWorldMatrix())) * vec4(m_meshVec[meshIndex].m_normalL[i], 0.0f))) <= 0)
+				{
+					shortestIndex = i;
+					shortestDistance = currDistance;
+				}
+			}
+		}
+	}
+	//Get all vertex that have same position
+	indeices.clear();
+	indeices.resize(0);
+	for (int i = 0; i < m_meshVec[meshIndex].m_posL.size(); i++)
+	{
+		if (m_meshVec[meshIndex].m_posL[i] == m_meshVec[meshIndex].m_posL[shortestIndex])
+		{
+			indeices.push_back(i);
+		}
+	}
+	if (shortestDistance < 0.02f)
+	{
+		return shortestIndex;
+	}
+	else
+		return -1;
 }

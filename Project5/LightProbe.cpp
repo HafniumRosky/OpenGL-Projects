@@ -43,7 +43,7 @@ void LightProbe::GenerateDualParaMap(GLsizei& width, GLsizei& height, MeshData* 
     }
     else
     {
-        std::string path = "../Project5\\Assets\\Precomputation\\Probe" + m_lightPorbeName + "\\DualParaboloidFront.hdr";
+        std::string path = "../Project5\\Assets\\Precomputation\\" + m_sceneName + "Probe" + m_lightPorbeName + "\\DualParaboloidFront.hdr";
         GLfloat* imgDataF = stbi_loadf(path.c_str(), &imgWidth, &imgHeight, &numComponents, 0);
         m_hasDualParaMap = true;
         width = imgWidth;
@@ -72,7 +72,7 @@ void LightProbe::GenerateDualParaMap(GLsizei& width, GLsizei& height, MeshData* 
     }
     else
     {
-        std::string path = "../Project5\\Assets\\Precomputation\\Probe" + m_lightPorbeName + "\\DualParaboloidBack.hdr";
+        std::string path = "../Project5\\Assets\\Precomputation\\" + m_sceneName + "Probe" + m_lightPorbeName + "\\DualParaboloidBack.hdr";
         GLfloat* imgDataB = stbi_loadf(path.c_str(), &imgWidth, &imgHeight, &numComponents, 0);
         m_hasDualParaMap = true;
         width = imgWidth;
@@ -128,10 +128,10 @@ void LightProbe::LoadLightProbe(GLsizei irrWidth, GLsizei irrHeight, GLsizei pre
     }*/
     
     //irradiance map
-    GenerateEmptyCubeMap(m_meshVec[0], irrWidth, irrHeight); //texture0, 2
+    GenerateEmptyCubeMap(m_meshVec[0], irrWidth, irrHeight); //texture0, 2(Global)
 
     //Prifilter map
-    GenerateEmptyCubeMap(m_meshVec[0], prefilterSize, prefilterSize, true); //texture0, 3
+    GenerateEmptyCubeMap(m_meshVec[0], prefilterSize, prefilterSize, true); //texture0, 3(Global)
 
     //BRDF LUT
     MeshData texturePlane;//mesh 1
@@ -139,6 +139,30 @@ void LightProbe::LoadLightProbe(GLsizei irrWidth, GLsizei irrHeight, GLsizei pre
     texturePlane.m_name = "TexturePlane";
     GeneratePlane(texturePlane);
     GenerateLUT(LUTSize, &texturePlane);//texture 1, 0
+    m_meshVec.push_back(texturePlane);
+}
+
+void LightProbe::LoadLocalLightProbe(GLsizei irrWidth, GLsizei irrHeight, GLsizei prefilterSize, GLsizei LUTSize)
+{
+    //Sampler
+    MeshData textureCube;
+    textureCube.SetVertexType(m_type);
+    textureCube.m_name = "TextureCube";
+    GenerateCube(textureCube);
+    GenerateEmptyCubeMap(textureCube, irrWidth, irrHeight);//texture0, 0(Local)
+    m_meshVec.push_back(textureCube);
+    //irradiance map
+    GenerateEmptyCubeMap(m_meshVec[0], irrWidth, irrHeight); //texture0, 1(Local)
+
+    //Prifilter map
+    GenerateEmptyCubeMap(m_meshVec[0], prefilterSize, prefilterSize, true); //texture0, 2(Local)
+
+    //BRDF LUT
+    MeshData texturePlane;//mesh 1
+    texturePlane.SetVertexType(m_type);
+    texturePlane.m_name = "TexturePlane";
+    GeneratePlane(texturePlane);
+    GenerateLUT(LUTSize, &texturePlane);//texture 1, 0(Local)
     m_meshVec.push_back(texturePlane);
 }
 
@@ -161,7 +185,7 @@ void LightProbe::SampleCube(float face)
     glDrawElements(GL_TRIANGLES, m_meshVec[1].m_indexVec.size(), GL_UNSIGNED_INT, 0);
 }
 
-void LightProbe::GenerateIrradianceMap(int numAzimuth, int numZenith)
+void LightProbe::GenerateIrradianceMap(int numAzimuth, int numZenith, GLuint cubeID)
 {
     //Bind effect
     m_meshVec[0].m_pEffect->BindEffect();
@@ -172,7 +196,7 @@ void LightProbe::GenerateIrradianceMap(int numAzimuth, int numZenith)
     std::vector<GLuint> texIDVec;
     std::vector<const char*> texParaNameVec;
     std::vector<GLenum> texTarget;
-    texIDVec.push_back(m_meshVec[0].m_TextureVec[1].texID);
+    texIDVec.push_back(cubeID);
     texParaNameVec.push_back("environmentMap");
     texTarget.push_back(GL_TEXTURE_CUBE_MAP);
     m_meshVec[0].m_pEffect->BindTexture(texIDVec, texParaNameVec, texTarget);
@@ -181,7 +205,7 @@ void LightProbe::GenerateIrradianceMap(int numAzimuth, int numZenith)
     glDrawElements(GL_TRIANGLES, m_meshVec[0].m_indexVec.size(), GL_UNSIGNED_INT, 0);
 }
 
-void LightProbe::Prefilter(float roughness)
+void LightProbe::Prefilter(float roughness, GLuint cubeMapID)
 {
     //Bind effect
     m_meshVec[0].m_pEffect->BindEffect();
@@ -191,7 +215,7 @@ void LightProbe::Prefilter(float roughness)
     std::vector<GLuint> texIDVec;
     std::vector<const char*> texParaNameVec;
     std::vector<GLenum> texTarget;
-    texIDVec.push_back(m_meshVec[0].m_TextureVec[1].texID);
+    texIDVec.push_back(cubeMapID);
     texParaNameVec.push_back("environmentMap");
     texTarget.push_back(GL_TEXTURE_CUBE_MAP);
     m_meshVec[0].m_pEffect->BindTexture(texIDVec, texParaNameVec, texTarget);
@@ -207,4 +231,34 @@ void LightProbe::IntegrateBRDF()
     
     m_meshVec[1].BindVertexArray();
     glDrawElements(GL_TRIANGLES, m_meshVec[1].m_indexVec.size(), GL_UNSIGNED_INT, 0);
+}
+
+void LightProbe::SetVolume(float radius)
+{
+    m_volumeRadius = radius;
+}
+
+void LightProbe::SetVolume(float length, float width, float height)
+{
+    m_volumeLength = length;
+    m_volumeWidth = width;
+    m_volumeHeight = height;
+}
+
+float LightProbe::ComputeWeight(vec3 pos)
+{
+    if (m_volumeShape == SPHERICAL)
+    {
+        return glm::clamp(1.0f - glm::distance(pos, GetTransform().GetPosition()) / m_volumeRadius, 0.0f, 1.0f);
+    }
+    else
+    {
+        //Compute volume local coordinate of POI point
+        GetTransform().ComputeLocalToWorldMatrix();
+        vec3 posL = glm::inverse(GetTransform().GetLoaclToWorldMatrix()) * vec4(pos, 1.0f);
+        vec3 dirL = vec3(abs(posL.x), abs(posL.y), abs(posL.z));
+        dirL = dirL * 2.0f / vec3(m_volumeLength, m_volumeHeight, m_volumeWidth);
+        float effective = max(max(dirL.x, dirL.y), dirL.z);
+        return glm::clamp(1.0f - effective, 0.0f, 1.0f);
+    }
 }

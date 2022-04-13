@@ -4,8 +4,11 @@ void GIScene::Start()
 {
 	//Load shaders
 	//Basic PBR shader
-	m_basicPBRVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\IBLVS.glsl");
-	m_basicPBRFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\IBLFS.glsl");
+	m_basicPBRVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\BasicPBRVS.glsl");
+	m_basicPBRFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\BasicPBRFS.glsl");
+	//Basic PBR shader with probes
+	m_basicPBRProbeVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\IBLVS.glsl");
+	m_basicPBRProbeFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\IBLFS.glsl");
 	//Diffuse irradiance shader
 	m_diffuseIrradianceVertexShader = Shader(GL_VERTEX_SHADER, "../Project5\\Assets\\Shaders\\BakeGIDiffVS.glsl");
 	m_diffuseIrradianceFragShader = Shader(GL_FRAGMENT_SHADER, "../Project5\\Assets\\Shaders\\BakeGIDiffFS.glsl");
@@ -29,6 +32,9 @@ void GIScene::Start()
 	//Basic PBR effect
 	m_basicPBREffect.AddShader(&m_basicPBRVertexShader, &m_basicPBRFragShader);
 	m_basicPBREffect.BindShaders();
+	//Basic PBR effect with probes
+	m_basicPBRProbeEffect.AddShader(&m_basicPBRProbeVertexShader, &m_basicPBRProbeFragShader);
+	m_basicPBRProbeEffect.BindShaders();
 	//Diffuse irradiance effect
 	m_diffuseIrradianceEffect.AddShader(&m_diffuseIrradianceVertexShader, &m_diffuseIrradianceFragShader);
 	m_diffuseIrradianceEffect.BindShaders();
@@ -50,15 +56,15 @@ void GIScene::Start()
 
 	//Load lights
 	PointLight pointLight;
-	pointLight.lightColor = vec4(23.47f, 21.31f, 20.79f, 1.0f);
-	pointLight.position = vec3(5.0, 5.0, 5.0);
+	pointLight.lightColor = vec4(23.47f, 21.31f, 20.79f, 1.0f) / 2.0f;
+	pointLight.position = vec3(0.0f, 4.0f, 4.0f);
 	pointLight.att = vec3(0.0f, 0.0f, 0.1f);
 	m_pointLight.push_back(pointLight);
-	pointLight.position = vec3(5.0, -5.0, 5.0);
+	//pointLight.position = vec3(5.0, -5.0, 5.0);
 	//m_pointLight.push_back(pointLight);
-	pointLight.position = vec3(-5.0, 5.0, 5.0);
+	//pointLight.position = vec3(-5.0, 5.0, 5.0);
 	//m_pointLight.push_back(pointLight);
-	pointLight.position = vec3(-5.0, -5.0, 5.0);
+	//pointLight.position = vec3(-5.0, -5.0, 5.0);
 	//m_pointLight.push_back(pointLight);
 
 	//Load GameObjects
@@ -87,7 +93,7 @@ void GIScene::Start()
 	//Set transform
 	//Set camera position
 	//m_camera.GetTransform().SetPosition(vec3(8.0f, 8.0f, 8.0f));
-	m_camera.GetTransform().SetPosition(0.0f, 0.0f, 9.0f);
+	m_camera.GetTransform().SetPosition(0.0f, 0.0f, -5.0f);
 	//Set camera target
 	//m_camera.SetTarget(m_playerShip.GetTransform().GetPosition() + vec3(0.0f, 3.0f, 0.0f));
 	m_camera.SetTarget(vec3(0.0f));
@@ -112,6 +118,83 @@ void GIScene::Start()
 	m_HDREnvir.GetTransform().SetPosition(m_samplerCam.GetTransform().GetPosition());
 	m_HDREnvir.LoadHDRSampler(m_HDRCubeWidth, m_HDRCubeHeight);
 	m_HDREnvir.LoadLightProbe(m_HDRCubeWidth, m_HDRCubeHeight, m_prefilterResolution, m_BRDFLUTResolution);
+
+	//Light probes
+	for (int i = 0; i < 2; i++)
+	{
+		std::stringstream strStream;
+		strStream << i;
+		std::string numString;
+		strStream >> numString;
+		m_LightProbe[i] = LightProbe(VertexPos, "Local" + numString, "GIScene", false, BOXBASED);
+		m_LightProbe[i].SetVolume(50.0f, 50.0f, 50.0f);
+		m_LightProbe[i].LoadLocalLightProbe(m_HDRCubeWidth, m_HDRCubeWidth, m_prefilterResolution, m_BRDFLUTResolution);
+	}
+	m_LightProbe[0].GetTransform().SetPosition(vec3(0.0f, 0.0f, -5.0f));
+	m_LightProbe[1].GetTransform().SetPosition(vec3(0.0f, 0.0f, -10.0f));
+
+	//Walls
+	m_Wall[0] = Plane(VertexPosNormalTex, 10, 10, "PBRWhiteTile");
+	m_Wall[0].LoadPBRGameObject(vec3(0.65f, 0.05f, 0.05f), 0.7f, 0.1f);
+	m_Wall[0].SetMeshEffectWithIndex(&m_basicPBREffect, 0);
+
+	m_Wall[1] = Plane(VertexPosNormalTex, 10, 10, "PBRWhiteTile");
+	m_Wall[1].LoadPBRGameObject(vec3(0.12f, 0.45f, 0.15f), 0.7f, 0.1f);
+	m_Wall[1].SetMeshEffectWithIndex(&m_basicPBREffect, 0);
+	for (int i = 2; i < 5; i++)
+	{
+		m_Wall[i] = Plane(VertexPosNormalTex, 10, 10, "PBRWhiteTile");
+		m_Wall[i].LoadPBRGameObject(vec3(0.73f), 0.7f, 0.1f);
+		m_Wall[i].SetMeshEffectWithIndex(&m_basicPBREffect, 0);
+	}
+	for (int i = 5; i < 6; i++)
+	{
+		m_Wall[i] = Plane(VertexPosNormalTex, 10, 10, "PBRWhiteTile");
+		m_Wall[i].LoadPBRGameObject(vec3(0.0f), 0.7f, 0.1f, -1.0f, vec4(23.47f, 21.31f, 20.79f, 1.0f));
+		m_Wall[i].SetMeshEffectWithIndex(&m_basicPBREffect, 0);
+	}
+
+	m_Wall[0].GetTransform().SetPosition(vec3(0.0f, 0.0f, -15.0f));
+	m_Wall[0].GetTransform().SetRotation(vec3(radians(90.0f), 0.0f, 0.0f));
+	m_Wall[1].GetTransform().SetPosition(vec3(0.0f, 0.0f, 5.0f));
+	m_Wall[1].GetTransform().SetRotation(vec3(radians(-90.0f), 0.0f, 0.0f));
+	m_Wall[2].GetTransform().SetPosition(vec3(5.0f, 0.0f, 0.0f));
+	m_Wall[2].GetTransform().SetRotation(vec3(0.0f, 0.0f, radians(90.0f)));
+	m_Wall[3].GetTransform().SetPosition(vec3(5.0f, 0.0f, -10.0f));
+	m_Wall[3].GetTransform().SetRotation(vec3(0.0f, 0.0f, radians(90.0f)));
+	m_Wall[4].GetTransform().SetPosition(vec3(-5.0f, 0.0f, 0.0f));
+	m_Wall[4].GetTransform().SetRotation(vec3(0.0f, 0.0f, radians(-90.0f)));
+	m_Wall[5].GetTransform().SetPosition(vec3(-5.0f, 0.0f, -10.0f));
+	m_Wall[5].GetTransform().SetRotation(vec3(0.0f, 0.0f, radians(-90.0f)));
+
+	//Floors
+	for (int i = 0; i < 2; i++)
+	{
+		m_floor[i] = Plane(VertexPosNormalTex, 10, 10, "PBRWhiteTile");
+		m_floor[i].LoadPBRGameObject(vec3(0.73f), 0.7f, 0.1f);
+		m_floor[i].SetMeshEffectWithIndex(&m_basicPBREffect, 0);
+	}
+	m_floor[0].GetTransform().SetPosition(vec3(0.0f, -5.0f, 0.0f));
+	m_floor[1].GetTransform().SetPosition(vec3(0.0f, -5.0f, -10.0f));
+
+	//Ceilings
+	for (int i = 0; i < 2; i++)
+	{
+		m_ceil[i] = Plane(VertexPosNormalTex, 10, 10, "PBRWhiteTile");
+		m_ceil[i].LoadPBRGameObject(vec3(0.73f), 0.7f, 0.1f);
+		m_ceil[i].SetMeshEffectWithIndex(&m_basicPBREffect, 0);
+	}
+	m_ceil[0].GetTransform().SetPosition(vec3(0.0f, 5.0f, 0.0f));
+	m_ceil[0].GetTransform().SetRotation(vec3(0.0f, 0.0f, radians(180.0f)));
+	m_ceil[1].GetTransform().SetPosition(vec3(0.0f, 5.0f, -10.0f));
+	m_ceil[1].GetTransform().SetRotation(vec3(0.0f, 0.0f, radians(180.0f)));
+
+	//AreaLight
+	m_areaLight = Plane(VertexPosNormalTex, 2, 2, "PBRWhiteTile");
+	m_areaLight.LoadPBRGameObject(vec3(0.0f), 0.1f, 0.7f, -1.0f, vec4(23.47f, 0.0f, 0.0f, 1.0f));
+	m_areaLight.SetMeshEffectWithIndex(&m_basicPBREffect, 0);
+	m_areaLight.GetTransform().SetPosition(vec3(4.999f, 0.0f, 0.0f));
+	m_areaLight.GetTransform().SetRotation(vec3(0.0f, 0.0f, radians(90.0f)));
 }
 
 void GIScene::SampleHDR()
@@ -206,7 +289,7 @@ void GIScene::TransformCubeToDualPara()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, data);
-	std::string savePath = "../Project5\\Assets\\Precomputation\\Probe" + m_HDREnvir.getProbeName() + "\\DualParaboloidFront.hdr";
+	std::string savePath = "../Project5\\Assets\\Precomputation\\" + m_sceneName + "Probe" + m_HDREnvir.getProbeName() + "\\DualParaboloidFront.hdr";
 	stbi_write_hdr(savePath.c_str(), m_HDRCubeWidth * 4, m_HDRCubeHeight * 4, 3, data);
 	//Bind the front texture to the probe
 	m_HDREnvir.SetDualParaMap(0, m_HDREnvir.GetMeshTexture(1, 0));
@@ -219,16 +302,125 @@ void GIScene::TransformCubeToDualPara()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, data);
-	savePath = "../Project5\\Assets\\Precomputation\\Probe" + m_HDREnvir.getProbeName() + "\\DualParaboloidBack.hdr";
+	savePath = "../Project5\\Assets\\Precomputation\\" + m_sceneName + "Probe" + m_HDREnvir.getProbeName() + "\\DualParaboloidBack.hdr";
 	stbi_write_hdr(savePath.c_str(), m_HDRCubeWidth * 4, m_HDRCubeHeight * 4, 3, data);
 	//Bind back texture to the probe
 	m_HDREnvir.SetDualParaMap(0, m_HDREnvir.GetMeshTexture(1, 1));
+}
+
+void GIScene::SampleSurrounding()
+{
+	//Bind Cam
+	m_samplerCam.BindFBO(0);
+	glViewport(0, 0, m_HDRCubeWidth, m_HDRCubeHeight);
+
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	//Reset view frustum
+	m_samplerCam.SetFrustum(90.0f, 1, 0.001f, 28.0f);
+	m_samplerCam.SetProjPerspective();
+	Effect::cbResize.proj = m_samplerCam.GetProj();
+	glBindBuffer(GL_UNIFORM_BUFFER, Effect::m_UBOid[2]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesOnResize), &Effect::cbResize, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	vec3 targetVec[] =
+	{
+		vec3(1.0f, 0.0f, 0.0f),
+		vec3(-1.0f, 0.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		vec3(0.0f, -1.0f, 0.0f),
+		vec3(0.0f, 0.0f, 1.0f),
+		vec3(0.0f, 0.0f, -1.0f)
+	};
+
+	vec3 upVec[] =
+	{
+		vec3(0.0f, -1.0f, 0.0f),
+		vec3(0.0f, -1.0f, 0.0f),
+		vec3(0.0f, 0.0f, 1.0f),
+		vec3(0.0f, 0.0f, -1.0f),
+		vec3(0.0f, -1.0f, 0.0f),
+		vec3(0.0f, -1.0f, 0.0f)
+	};
+
+	for (int j = 0; j < 2; j++)
+	{
+		//Set camera position
+		m_samplerCam.GetTransform().SetPosition(m_LightProbe[j].GetTransform().GetPosition());
+		for (int i = 0; i < 6; i++)
+		{
+			m_samplerCam.SetTarget(m_samplerCam.GetTransform().GetPosition() + targetVec[i]);
+			m_samplerCam.LookAt(upVec[i]);
+			Effect::cbFrame.view = m_samplerCam.GetView();
+			glBindBuffer(GL_UNIFORM_BUFFER, Effect::m_UBOid[1]);
+			glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesEveryFrame), &Effect::cbFrame, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+			//Bind frame buffer
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_LightProbe[j].GetMeshTextureID(0, 0), 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			//Sample surrounding
+			//Assemble input
+			for (int i = 0; i < 6; i++)
+			{
+				m_Wall[i].InputAssemble();
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				m_floor[i].InputAssemble();
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				m_ceil[i].InputAssemble();
+			}
+
+			m_areaLight.InputAssemble();
+
+			//Enable depth test
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
+			//Set clear flags
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			//Set render state
+			Effect::cbState.renderDepth = false;
+			glBindBuffer(GL_UNIFORM_BUFFER, Effect::m_UBOid[4]);
+			glBufferData(GL_UNIFORM_BUFFER, sizeof(CBRenderState), &Effect::cbState, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+			glDepthMask(GL_TRUE);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			//for(int i = 0; i < 36; i++)
+				//m_sphere[i].DrawPBR();
+			for (int i = 0; i < 6; i++)
+				m_Wall[i].DrawPBR();
+			for (int i = 0; i < 2; i++)
+				m_floor[i].DrawPBR();
+			for (int i = 0; i < 2; i++)
+				m_ceil[i].DrawPBR();
+			m_areaLight.DrawPBR();
+		}
+	}
 }
 
 void GIScene::BakeIrradianceMap()
 {
 	m_HDREnvir.SetMeshEffectWithIndex(&m_diffuseIrradianceEffect, 0);
 	m_HDREnvir.InputAssemble(0);
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_LightProbe[i].SetMeshEffectWithIndex(&m_diffuseIrradianceEffect, 0);
+		m_LightProbe[i].InputAssemble(0);
+	}
 
 	m_samplerCam.BindFBO(0);
 	glViewport(0, 0, m_HDRCubeWidth, m_HDRCubeHeight);
@@ -239,6 +431,10 @@ void GIScene::BakeIrradianceMap()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+	//Reset camera projection and location
+	m_samplerCam.SetFrustum(90.0f, 1.0f, 0.1f, 10.0f);
+	m_samplerCam.GetTransform().SetPosition(0.0f, 0.0f, 0.0f);
+	m_samplerCam.SetProjPerspective();
 	Effect::cbResize.proj = m_samplerCam.GetProj();
 	glBindBuffer(GL_UNIFORM_BUFFER, Effect::m_UBOid[2]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesOnResize), &Effect::cbResize, GL_DYNAMIC_DRAW);
@@ -277,7 +473,7 @@ void GIScene::BakeIrradianceMap()
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_HDREnvir.GetMeshTextureID(0, 2), 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		m_HDREnvir.GenerateIrradianceMap(250, 250);
+		m_HDREnvir.GenerateIrradianceMap(250, 250, m_HDREnvir.GetMeshTextureID(0, 1));
 
 		GLfloat* data = new GLfloat[m_HDRCubeWidth * m_HDRCubeWidth * 3];
 		//Save to local file
@@ -287,16 +483,83 @@ void GIScene::BakeIrradianceMap()
 		strStream << i;
 		std::string numString;
 		strStream >> numString;
-		std::string savePath = "../Project5\\Assets\\Precomputation\\Probe" + m_HDREnvir.getProbeName() + "\\IrradianceMap" + numString + ".hdr";
+		std::string savePath = "../Project5\\Assets\\Precomputation\\" + m_sceneName + "Probe" + m_HDREnvir.getProbeName() + "\\IrradianceMap" + numString + ".hdr";
 		stbi_write_hdr(savePath.c_str(), m_HDRCubeWidth, m_HDRCubeHeight, 3, data);
 	}
+
 	//Bind irradiance map to the probe
 	m_HDREnvir.SetIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
+
+	//Light probes
+	for (int j = 0; j < 2; j++)
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			m_samplerCam.SetTarget(targetVec[i]);
+			m_samplerCam.LookAt(upVec[i]);
+			Effect::cbFrame.view = m_samplerCam.GetView();
+			glBindBuffer(GL_UNIFORM_BUFFER, Effect::m_UBOid[1]);
+			glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesEveryFrame), &Effect::cbFrame, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+			//Bind frame buffer
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_LightProbe[j].GetMeshTextureID(0, 1), 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			m_LightProbe[j].GenerateIrradianceMap(250, 250, m_LightProbe[j].GetMeshTextureID(0, 0));
+
+			GLfloat* data = new GLfloat[m_HDRCubeWidth * m_HDRCubeWidth * 3];
+			//Save to local file
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_LightProbe[j].GetMeshTextureID(0, 1));
+			glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, GL_FLOAT, data);
+			std::stringstream strStream;
+			strStream << i;
+			std::string numString;
+			strStream >> numString;
+			std::string savePath = "../Project5\\Assets\\Precomputation\\" + m_sceneName + "Probe" + m_LightProbe[j].getProbeName() + "\\IrradianceMap" + numString + ".hdr";
+			stbi_write_hdr(savePath.c_str(), m_HDRCubeWidth, m_HDRCubeHeight, 3, data);
+		}
+	}
+
+
 	//For test
 	//m_sphere.PushIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
 	for (int i = 0; i < 36; i++)
 	{
 		m_sphere[i].PushIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
+	}
+
+	for (int i = 0; i < 6; i++)
+	{
+		m_Wall[i].PushIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
+		for (int j = 0; j < 2; j++)
+		{
+			m_Wall[i].PushIrradianceMap(m_LightProbe[j].GetMeshTexture(0, 1));
+		}
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_floor[i].PushIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
+		for (int j = 0; j < 2; j++)
+		{
+			m_floor[i].PushIrradianceMap(m_LightProbe[j].GetMeshTexture(0, 1));
+		}
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_ceil[i].PushIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
+		for (int j = 0; j < 2; j++)
+		{
+			m_ceil[i].PushIrradianceMap(m_LightProbe[j].GetMeshTexture(0, 1));
+		}
+	}
+
+	m_areaLight.PushIrradianceMap(m_HDREnvir.GetMeshTexture(0, 2));
+	for (int j = 0; j < 2; j++)
+	{
+		m_areaLight.PushIrradianceMap(m_LightProbe[j].GetMeshTexture(0, 1));
 	}
 }
 
@@ -304,6 +567,12 @@ void GIScene::BakePrefilteredMap()
 {
 	m_HDREnvir.SetMeshEffectWithIndex(&m_prefilterMapEffect, 0);
 	m_HDREnvir.InputAssemble(0);
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_LightProbe[i].SetMeshEffectWithIndex(&m_prefilterMapEffect, 0);
+		m_LightProbe[i].InputAssemble(0);
+	}
 
 	m_samplerCam.BindFBO(0);
 
@@ -365,13 +634,82 @@ void GIScene::BakePrefilteredMap()
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, m_HDREnvir.GetMeshTextureID(0, 3), i);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			//Prefilter
-			m_HDREnvir.Prefilter(roughness);
+			m_HDREnvir.Prefilter(roughness, m_HDREnvir.GetMeshTextureID(0, 1));
 		}
 	}
+
+	//LightProbes
+	for (int k = 0; k < 2; k++)
+	{
+		//filter all mip maps
+		for (unsigned int i = 0; i < m_maxMipLevel; i++)
+		{
+			//Resize render buffer
+			unsigned int mipResolution = m_prefilterResolution * pow(0.5, i);
+			glBindRenderbuffer(GL_RENDERBUFFER, m_samplerCam.GetRBO(0));
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipResolution, mipResolution);
+			//Resize view port
+			glViewport(0, 0, mipResolution, mipResolution);
+			float roughness = i / (float)(m_maxMipLevel - 1);
+
+			//prefilter 6 different faces
+			for (unsigned int j = 0; j < 6; j++)
+			{
+				//Update view
+				m_samplerCam.SetTarget(targetVec[j]);
+				m_samplerCam.LookAt(upVec[j]);
+				Effect::cbFrame.view = m_samplerCam.GetView();
+				glBindBuffer(GL_UNIFORM_BUFFER, Effect::m_UBOid[1]);
+				glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesEveryFrame), &Effect::cbFrame, GL_DYNAMIC_DRAW);
+				glBindBuffer(GL_UNIFORM_BUFFER, 0);
+				//Bind mip map to the render target
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+					GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, m_LightProbe[k].GetMeshTextureID(0, 2), i);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				//Prefilter
+				m_LightProbe[k].Prefilter(roughness, m_LightProbe[k].GetMeshTextureID(0, 0));
+			}
+		}
+	}
+
+
 	//m_sphere.PushPrefilteredMap(m_HDREnvir.GetMeshTexture(0, 3));
 	for (int i = 0; i < 36; i++)
 	{
 		m_sphere[i].PushPrefilteredMap(m_HDREnvir.GetMeshTexture(0, 3));
+	}
+
+	for (int i = 0; i < 6; i++)
+	{
+		m_Wall[i].PushPrefilteredMap(m_HDREnvir.GetMeshTexture(0, 3));
+		for (int j = 0; j < 2; j++)
+		{
+			m_Wall[i].PushPrefilteredMap(m_LightProbe[j].GetMeshTexture(0, 2));
+		}
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_floor[i].PushPrefilteredMap(m_HDREnvir.GetMeshTexture(0, 3));
+		for (int j = 0; j < 2; j++)
+		{
+			m_floor[i].PushPrefilteredMap(m_LightProbe[j].GetMeshTexture(0, 2));
+		}
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_ceil[i].PushPrefilteredMap(m_HDREnvir.GetMeshTexture(0, 3));
+		for (int j = 0; j < 2; j++)
+		{
+			m_ceil[i].PushPrefilteredMap(m_LightProbe[j].GetMeshTexture(0, 2));
+		}
+	}
+
+	m_areaLight.PushPrefilteredMap(m_HDREnvir.GetMeshTexture(0, 3));
+	for (int j = 0; j < 2; j++)
+	{
+		m_areaLight.PushPrefilteredMap(m_LightProbe[j].GetMeshTexture(0, 2));
 	}
 }
 
@@ -413,7 +751,7 @@ void GIScene::IntegrateBRDF()
 	GLfloat* data = new GLfloat[m_BRDFLUTResolution * m_BRDFLUTResolution * 3];
 	glBindTexture(GL_TEXTURE_2D, m_HDREnvir.GetMeshTextureID(1, 0));
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, data);
-	std::string savePath = "../Project5\\Assets\\Precomputation\\Probe" + m_HDREnvir.getProbeName() + "\\BRDFLUT.hdr";
+	std::string savePath = "../Project5\\Assets\\Precomputation\\" + m_sceneName + "Probe" + m_HDREnvir.getProbeName() + "\\BRDFLUT.hdr";
 	stbi_write_hdr(savePath.c_str(), m_BRDFLUTResolution, m_BRDFLUTResolution, 3, data);
 
 	//m_sphere.PushLUT(m_HDREnvir.GetMeshTexture(1, 0));
@@ -421,10 +759,30 @@ void GIScene::IntegrateBRDF()
 	{
 		m_sphere[i].PushLUT(m_HDREnvir.GetMeshTexture(1, 0));
 	}
+
+	for (int i = 0; i < 6; i++)
+	{
+		m_Wall[i].PushLUT(m_HDREnvir.GetMeshTexture(1, 0));
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_floor[i].PushLUT(m_HDREnvir.GetMeshTexture(1, 0));
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_ceil[i].PushLUT(m_HDREnvir.GetMeshTexture(1, 0));
+	}
+
+	m_areaLight.PushLUT(m_HDREnvir.GetMeshTexture(1, 0));
 }
 
 void GIScene::Bake()
 {
+	//Sample Surrounding
+	SampleSurrounding();
+
 	//Diffuse
 	BakeIrradianceMap();
 
@@ -518,6 +876,70 @@ void GIScene::InitiScene()
 	{
 		m_sphere[i].InputAssemble();
 	}
+
+	for (int i = 0; i < 6; i++)
+	{
+		m_Wall[i].SetMeshEffectWithIndex(&m_basicPBRProbeEffect, 0);
+		m_Wall[i].InputAssemble();
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_floor[i].SetMeshEffectWithIndex(&m_basicPBRProbeEffect, 0);
+		m_floor[i].InputAssemble();
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_ceil[i].SetMeshEffectWithIndex(&m_basicPBRProbeEffect, 0);
+		m_ceil[i].InputAssemble();
+	}
+	m_areaLight.SetMeshEffectWithIndex(&m_basicPBRProbeEffect, 0);
+	m_areaLight.InputAssemble();
+}
+
+void GIScene::ComputeWeights()
+{
+	float weight0;
+	float weight1;
+	float weight;
+	for (int i = 0; i < 6; i++)
+	{
+		weight0 = m_LightProbe[0].ComputeWeight(m_Wall[i].GetTransform().GetPosition());
+		weight1 = m_LightProbe[1].ComputeWeight(m_Wall[i].GetTransform().GetPosition());
+		weight = weight0 + weight1;
+		m_Wall[i].m_probeWeight[0] = weight0 / weight;
+		m_Wall[i].m_probeWeight[1] = weight1 / weight;
+		m_Wall[i].m_probePos[0] = m_LightProbe[0].GetTransform().GetPosition();
+		m_Wall[i].m_probePos[1] = m_LightProbe[1].GetTransform().GetPosition();
+	}
+	for (int i = 0; i < 2; i++)
+	{
+		weight0 = m_LightProbe[0].ComputeWeight(m_floor[i].GetTransform().GetPosition());
+		weight1 = m_LightProbe[1].ComputeWeight(m_floor[i].GetTransform().GetPosition());
+		weight = weight0 + weight1;
+		m_floor[i].m_probeWeight[0] = weight0 / weight;
+		m_floor[i].m_probeWeight[1] = weight1 / weight;
+		m_floor[i].m_probePos[0] = m_LightProbe[0].GetTransform().GetPosition();
+		m_floor[i].m_probePos[1] = m_LightProbe[1].GetTransform().GetPosition();
+	}
+	for (int i = 0; i < 2; i++)
+	{
+		weight0 = m_LightProbe[0].ComputeWeight(m_ceil[i].GetTransform().GetPosition());
+		weight1 = m_LightProbe[1].ComputeWeight(m_ceil[i].GetTransform().GetPosition());
+		weight = weight0 + weight1;
+		m_ceil[i].m_probeWeight[0] = weight0 / weight;
+		m_ceil[i].m_probeWeight[1] = weight1 / weight;
+		m_ceil[i].m_probePos[0] = m_LightProbe[0].GetTransform().GetPosition();
+		m_ceil[i].m_probePos[1] = m_LightProbe[1].GetTransform().GetPosition();
+	}
+	weight0 = m_LightProbe[0].ComputeWeight(m_areaLight.GetTransform().GetPosition());
+	weight1 = m_LightProbe[1].ComputeWeight(m_areaLight.GetTransform().GetPosition());
+	weight = weight0 + weight1;
+	m_areaLight.m_probeWeight[0] = weight0 / weight;
+	m_areaLight.m_probeWeight[1] = weight1 / weight;
+	m_areaLight.m_probePos[0] = m_LightProbe[0].GetTransform().GetPosition();
+	m_areaLight.m_probePos[1] = m_LightProbe[1].GetTransform().GetPosition();
 }
 
 void GIScene::RenderObjects()
@@ -547,8 +969,15 @@ void GIScene::RenderObjects()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glDepthMask(GL_TRUE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	for(int i = 0; i < 36; i++)
-		m_sphere[i].DrawPBR();
+	//for(int i = 0; i < 36; i++)
+		//m_sphere[i].DrawPBR();
+	for (int i = 0; i < 6; i++)
+		m_Wall[i].DrawPBR();
+	for (int i = 0; i < 2; i++)
+		m_floor[i].DrawPBR();
+	for (int i = 0; i < 2; i++)
+		m_ceil[i].DrawPBR();
+	m_areaLight.DrawPBR();
 	//Draw Environment map
 	glDepthFunc(GL_LEQUAL);
 	m_HDREnvir.Draw(1);
@@ -557,6 +986,7 @@ void GIScene::RenderObjects()
 
 void GIScene::DisplayScene()
 {
+	ComputeWeights();
 	RenderObjects();
 }
 

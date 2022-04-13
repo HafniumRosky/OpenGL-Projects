@@ -5,89 +5,95 @@ void Cube::GenerateCube(MeshData& cubeMesh)
     float side = 1.0f;
     float side2 = side / 2.0f;
     //Position
-    // Front
-    cubeMesh.m_posL.push_back(vec3(-side2, -side2, side2));
-    cubeMesh.m_posL.push_back(vec3(side2, -side2, side2));
-    cubeMesh.m_posL.push_back(vec3(side2, side2, side2));
-    cubeMesh.m_posL.push_back(vec3(-side2, side2, side2));
-    // Right
-    cubeMesh.m_posL.push_back(vec3(side2, -side2, side2));
+    // right
     cubeMesh.m_posL.push_back(vec3(side2, -side2, -side2));
     cubeMesh.m_posL.push_back(vec3(side2, side2, -side2));
     cubeMesh.m_posL.push_back(vec3(side2, side2, side2));
-    // Back
-    cubeMesh.m_posL.push_back(vec3(-side2, -side2, -side2));
-    cubeMesh.m_posL.push_back(vec3(-side2, side2, -side2));
-    cubeMesh.m_posL.push_back(vec3(side2, side2, -side2));
-    cubeMesh.m_posL.push_back(vec3(side2, -side2, -side2));
-    // Left
+    cubeMesh.m_posL.push_back(vec3(side2, -side2, side2));
+    // left
     cubeMesh.m_posL.push_back(vec3(-side2, -side2, side2));
     cubeMesh.m_posL.push_back(vec3(-side2, side2, side2));
     cubeMesh.m_posL.push_back(vec3(-side2, side2, -side2));
     cubeMesh.m_posL.push_back(vec3(-side2, -side2, -side2));
-    // Bottom
-    cubeMesh.m_posL.push_back(vec3(-side2, -side2, side2));
-    cubeMesh.m_posL.push_back(vec3(-side2, -side2, -side2));
-    cubeMesh.m_posL.push_back(vec3(side2, -side2, -side2));
-    cubeMesh.m_posL.push_back(vec3(side2, -side2, side2));
-    // Top
+    // top
+    cubeMesh.m_posL.push_back(vec3(-side2, side2, -side2));
     cubeMesh.m_posL.push_back(vec3(-side2, side2, side2));
     cubeMesh.m_posL.push_back(vec3(side2, side2, side2));
     cubeMesh.m_posL.push_back(vec3(side2, side2, -side2));
+    // bottom
+    cubeMesh.m_posL.push_back(vec3(side2, -side2, -side2));
+    cubeMesh.m_posL.push_back(vec3(side2, -side2, side2));
+    cubeMesh.m_posL.push_back(vec3(-side2, -side2, side2));
+    cubeMesh.m_posL.push_back(vec3(-side2, -side2, -side2));
+    // back
+    cubeMesh.m_posL.push_back(vec3(side2, -side2, side2));
+    cubeMesh.m_posL.push_back(vec3(side2, side2, side2));
+    cubeMesh.m_posL.push_back(vec3(-side2, side2, side2));
+    cubeMesh.m_posL.push_back(vec3(-side2, -side2, side2));
+    // front
+    cubeMesh.m_posL.push_back(vec3(-side2, -side2, -side2));
     cubeMesh.m_posL.push_back(vec3(-side2, side2, -side2));
+    cubeMesh.m_posL.push_back(vec3(side2, side2, -side2));
+    cubeMesh.m_posL.push_back(vec3(side2, -side2, -side2));
 
     //Index
     GLuint index[36] = {
-        0,1,2,0,2,3,
-        4,5,6,4,6,7,
-        8,9,10,8,10,11,
-        12,13,14,12,14,15,
-        16,17,18,16,18,19,
-        20,21,22,20,22,23
+        0,1,2,2,3,0,
+        4,5,6,6,7,4,
+        8,9,10,10,11,8,
+        12,13,14,14,15,12,
+        16,17,18,18,19,16,
+        20,21,22,22,23,20
     };
     for (int i = 0; i < 36; i++)
         cubeMesh.m_indexVec.push_back(index[i]);
 
     //Normal and Color
-    // Front
-    for (int i = 0; i < 4; ++i)
-    {
-        cubeMesh.m_normalL.push_back(vec3(0.0f, 0.0f, 1.0f));
-        cubeMesh.m_color.push_back(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    }
-
-    // Right
+    // right
     for (int i = 0; i < 4; ++i)
     {
         cubeMesh.m_normalL.push_back(vec3(1.0f, 0.0f, 0.0f));
+        cubeMesh.m_tangent.push_back(vec4(0.0f, 0.0f, 1.0f, 1.0f));
         cubeMesh.m_color.push_back(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
-    // Back
-    for (int i = 0; i < 4; ++i)
-    {
-        cubeMesh.m_normalL.push_back(vec3(0.0f, 0.0f, -1.0f));
-        cubeMesh.m_color.push_back(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    }
-
-    // Left
+    // left
     for (int i = 0; i < 4; ++i)
     {
         cubeMesh.m_normalL.push_back(vec3(-1.0f, 0.0f, 0.0f));
+        cubeMesh.m_tangent.push_back(vec4(0.0f, 0.0f, -1.0f, 1.0f));
         cubeMesh.m_color.push_back(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
-    //Bottom
-    for (int i = 0; i < 4; ++i)
-    {
-        cubeMesh.m_normalL.push_back(vec3(0.0f, -1.0f, 0.0f));
-        cubeMesh.m_color.push_back(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    }
-
-    //Top
+    // top
     for (int i = 0; i < 4; ++i)
     {
         cubeMesh.m_normalL.push_back(vec3(0.0f, 1.0f, 0.0f));
+        cubeMesh.m_tangent.push_back(vec4(1.0f, 0.0f, 0.0f, 1.0f));
+        cubeMesh.m_color.push_back(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    }
+
+    // bottom
+    for (int i = 0; i < 4; ++i)
+    {
+        cubeMesh.m_normalL.push_back(vec3(0.0f, -1.0f, 0.0f));
+        cubeMesh.m_tangent.push_back(vec4(-1.0f, 0.0f, 0.0f, 1.0f));
+        cubeMesh.m_color.push_back(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    }
+
+    //back
+    for (int i = 0; i < 4; ++i)
+    {
+        cubeMesh.m_normalL.push_back(vec3(0.0f, 0.0f, 1.0f));
+        cubeMesh.m_tangent.push_back(vec4(-1.0f, 0.0f, 0.0f, 1.0f));
+        cubeMesh.m_color.push_back(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    }
+
+    //front
+    for (int i = 0; i < 4; ++i)
+    {
+        cubeMesh.m_normalL.push_back(vec3(0.0f, 0.0f, -1.0f));
+        cubeMesh.m_tangent.push_back(vec4(1.0f, 0.0f, 0.0f, 1.0f));
         cubeMesh.m_color.push_back(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     }
 }
@@ -104,6 +110,48 @@ void Cube::LoadGameObject(float gloss)
     m_meshVec[0].m_material.gloss = gloss;
 }
 
+void Cube::LoadPBRTextures(MeshData& cubeMesh, bool loadTex)
+{
+    Texture albedoMap;
+    albedoMap.name = m_materialName + "_basecolor.png";
+    albedoMap.type = "albedo";
+    Texture metallicMap;
+    metallicMap.name = m_materialName + "_metallic.png";
+    metallicMap.type = "metallic";
+    Texture roughnessMap;
+    roughnessMap.name = m_materialName + "_roughness.png";
+    roughnessMap.type = "roughness";
+
+
+    if (loadTex)
+    {
+        SetUpTextureMapFromFile(m_texturePath, true, &albedoMap, GL_MIRRORED_REPEAT);
+        SetUpTextureMapFromFile(m_texturePath, true, &metallicMap, GL_MIRRORED_REPEAT);
+        SetUpTextureMapFromFile(m_texturePath, true, &roughnessMap, GL_MIRRORED_REPEAT);
+    }
+
+    cubeMesh.m_TextureVec.push_back(albedoMap);
+    cubeMesh.m_TextureVec.push_back(metallicMap);
+    cubeMesh.m_TextureVec.push_back(roughnessMap);
+
+    if (m_loadNormal)
+    {
+        Texture normalMap;
+        normalMap.name = m_materialName + "_normal.png";
+        normalMap.type = "normal";
+        SetUpTextureMapFromFile(m_texturePath, true, &normalMap, GL_MIRRORED_REPEAT);
+        cubeMesh.m_TextureVec.push_back(normalMap);
+    }
+
+    if (m_loadAO)
+    {
+        Texture aoMap;
+        aoMap.name = m_materialName + "_ao.png";
+        aoMap.type = "AO";
+        SetUpTextureMapFromFile(m_texturePath, true, &aoMap, GL_MIRRORED_REPEAT);
+        cubeMesh.m_TextureVec.push_back(aoMap);
+    }
+}
 
 void Cube::LoadPBRGameObject(vec3 albedo, float metallic, float roughness)
 {
@@ -113,6 +161,10 @@ void Cube::LoadPBRGameObject(vec3 albedo, float metallic, float roughness)
     cubeMesh.m_PBRMaterial.metallic = metallic;
     cubeMesh.m_PBRMaterial.roughness = roughness;
     GenerateCube(cubeMesh);
+    bool loadTex = true;
+    if (albedo.x >= 0)
+        loadTex = false;
+    LoadPBRTextures(cubeMesh, loadTex);
     m_meshVec.push_back(cubeMesh);
 }
 
@@ -137,9 +189,43 @@ void Cube::Draw()
 
 void Cube::DrawPBR()
 {
-    GetTransform().ComputeLocalToWorldMatrix();
+    this->GetTransform().ComputeLocalToWorldMatrix();
     //Bind effect
     m_meshVec[0].m_pEffect->BindEffect();
+    //Bind texture
+    std::vector<GLuint> texIDVec;
+    std::vector<const char*> texParaNameVec;
+    std::vector<GLenum> texTarget;
+    texIDVec.push_back(m_meshVec[0].m_TextureVec[0].texID);
+    texIDVec.push_back(m_meshVec[0].m_TextureVec[1].texID);
+    texIDVec.push_back(m_meshVec[0].m_TextureVec[2].texID);
+    texParaNameVec.push_back("albedoMap");
+    texParaNameVec.push_back("metallicMap");
+    texParaNameVec.push_back("roughnessMap");
+    texTarget.push_back(GL_TEXTURE_2D);
+    texTarget.push_back(GL_TEXTURE_2D);
+    texTarget.push_back(GL_TEXTURE_2D);
+    //test
+    texIDVec.push_back(m_meshVec[0].m_TextureVec[3].texID);
+    texIDVec.push_back(m_meshVec[0].m_TextureVec[4].texID);
+    texIDVec.push_back(m_meshVec[0].m_TextureVec[5].texID);
+    texParaNameVec.push_back("irradianceMap");
+    texParaNameVec.push_back("prefilteredMap");
+    texParaNameVec.push_back("BRDFLUT");
+    texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+    texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+    texTarget.push_back(GL_TEXTURE_2D);
+
+    //Bind uniform
+    glUniform4fv(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "emmision"), 1, &m_emmision[0]);
+
+    if (m_loadNormal)
+    {
+        texIDVec.push_back(m_meshVec[0].m_TextureVec[3].texID);
+        texParaNameVec.push_back("normalMap");
+        texTarget.push_back(GL_TEXTURE_2D);
+    }
+    m_meshVec[0].m_pEffect->BindTexture(texIDVec, texParaNameVec, texTarget);
     //Update Constant Buffer(change every draw)
     //World matrix
     Effect::cbDrawPBR.world = GetMeshWorld(0);

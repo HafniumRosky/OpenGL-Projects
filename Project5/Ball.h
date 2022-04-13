@@ -34,7 +34,7 @@ public:
 		m_loadNormal = loadNormal;
 	}
 	~Ball() {}
-	void LoadGameObject(float gloss);
+	void LoadGameObject(vec4 color, float gloss);
 	void LoadPBRGameObject(vec3 albedo = vec3(-1.0f, -1.0f, -1.0f), float metallic = -1.0f, float roughness = -1.0f);
 	void Draw();
 	void DrawPBR();

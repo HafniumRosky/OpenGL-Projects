@@ -6,15 +6,19 @@
 #include "GameScene.h"
 #include "Effect.h"
 #include "Ball.h"
+#include "Plane.h"
 #include "Skybox.h"
+#include "Cube.h"
 #include "LightProbe.h"
 
 class GIScene : public GameScene
 {
 private:
+	std::string m_sceneName = "GIScene";
+
 	unsigned int m_maxMipLevel = 5;
 
-	GLsizei m_prefilterResolution = 128;
+	GLsizei m_prefilterResolution = 512;
 	GLsizei m_BRDFLUTResolution = 512;
 
 	GLsizei m_sceneWidth = 1920;
@@ -28,6 +32,9 @@ private:
 	//Basic PBR shader
 	Shader m_basicPBRVertexShader;
 	Shader m_basicPBRFragShader;
+	//Basic PBR shader with probes
+	Shader m_basicPBRProbeVertexShader;
+	Shader m_basicPBRProbeFragShader;
 	//Diffuse irradiance shader
 	Shader m_diffuseIrradianceVertexShader;
 	Shader m_diffuseIrradianceFragShader;
@@ -53,6 +60,8 @@ private:
 	//Effects
 	//Basic PBR effect
 	Effect m_basicPBREffect;
+	//Basic PBR effect with probe
+	Effect m_basicPBRProbeEffect;
 	//Diffuse Irradiance effect
 	Effect m_diffuseIrradianceEffect;
 	//Prefilter map effect
@@ -79,10 +88,23 @@ private:
 	//PBR material sphere
 	//Ball m_sphere;
 	Ball m_sphere[36];
+	//Walls
+	Plane m_Wall[6];
+	//Dynamic object
+	Ball m_dynamic;
+	//Floor
+	Plane m_floor[2];
+	//Ceiling
+	Plane m_ceil[2];
+	//AreaLight
+	Plane m_areaLight;
+
 	//HDR environment
 	LightProbe m_HDREnvir;
 	GLsizei m_HDRCubeWidth = 512;
 	GLsizei m_HDRCubeHeight = 512;
+	//Local Probes
+	LightProbe m_LightProbe[2];
 
 	//Shadow Map
 	RenderTexture m_shadowMap;
@@ -102,11 +124,14 @@ private:
 
 	//Precomputation
 	void SampleHDR();
+	void SampleSurrounding();
 	void TransformCubeToDualPara();
 	void BakeIrradianceMap();
 	void BakePrefilteredMap();
 	void IntegrateBRDF();
 	void Bake();
+
+	void ComputeWeights();
 
 public:
 	GIScene() {}

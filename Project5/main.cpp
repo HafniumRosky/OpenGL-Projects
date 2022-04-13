@@ -19,6 +19,7 @@
 #include "AssignmentScene4.h"
 #include "AnimationScene1.h"
 #include "AnimationScene2.h"
+#include "AnimationScene3.h"
 #include "Mouse.h"
 #include "Keyboard.h"
 #include "LightHelper.h"
@@ -51,10 +52,20 @@ GameScene* animationScene1;
 //Animation assignment scene 2
 GameScene* animationScene2;
 
+//Animation assignment scene 3
+GameScene* animationScene3;
+
+//Applied scene
+GameScene* runningScene;
+
 //Mouse
 Mouse mouse;
 //Keyboard
 Keyboard keyboard;
+
+
+//Apply mouse func
+bool useOriginalMouseMotion = true;
 
 //ImGui functions
 void ImGuiDisplay();
@@ -77,7 +88,7 @@ int main(int argc, char** argv)
 	glutInitWindowSize(1920, 1080);
 	glutCreateWindow("Wavy Navy");
 
-	mouse.initMouse();
+	mouse.initMouseNoCursor();
 	// Tell glut where the display function is
 	glutDisplayFunc(Display);
 	glutPassiveMotionFunc(MouseMotion);
@@ -109,38 +120,9 @@ int main(int argc, char** argv)
 	//ImGui_ImplGLUT_InstallFuncs();
 	ImGui_ImplOpenGL3_Init();
 
-
-	//basicScene = new BasicScene();
-	//basicScene->Start();
-	//basicScene->InitiScene();
-	
-	giScene = new GIScene();
-	giScene->Start();
-	giScene->InitiScene();
-
-	//assignmentScene1 = new AssignmentScene1();
-	//assignmentScene1->Start();
-	//assignmentScene1->InitiScene();
-
-	//assignmentScene2 = new AssignmentScene2();
-	//assignmentScene2->Start();
-	//assignmentScene2->InitiScene();
-
-	//assignmentScene3 = new AssignmentScene3();
-	//assignmentScene3->Start();
-	//assignmentScene3->InitiScene();
-
-	//assignmentScene4 = new AssignmentScene4();
-	//assignmentScene4->Start();
-	//assignmentScene4->InitiScene();
-
-	//animationScene1 = new AnimationScene1();
-	//animationScene1->Start();
-	//animationScene1->InitiScene();
-
-	//animationScene2 = new AnimationScene2();
-	//animationScene2->Start();
-	//animationScene2->InitiScene();
+	runningScene = new GIScene();
+	runningScene->Start();
+	runningScene->InitiScene();
 
 	// Begin infinite event loop
 	glutMainLoop();
@@ -156,11 +138,22 @@ int main(int argc, char** argv)
 void MouseFunction(int button, int state, int x, int y)
 {
 	mouse.MouseFunction(button, state, x, y);
+	ImGuiIO& io = ImGui::GetIO();
+	io.AddMousePosEvent((float)x, (float)y);
+	int IMGUI_button = -1;
+	if (button == GLUT_LEFT_BUTTON) IMGUI_button = 0;
+	if (button == GLUT_RIGHT_BUTTON) IMGUI_button = 1;
+	if (button == GLUT_MIDDLE_BUTTON) IMGUI_button = 2;
+	if (IMGUI_button != -1 && state == GLUT_DOWN || state == GLUT_UP)
+		io.AddMouseButtonEvent(IMGUI_button, state == GLUT_DOWN);
 }
 
 void MouseMotion(int x, int y)
 {
-	mouse.MouseMotion(x, y);
+	if (useOriginalMouseMotion)
+		mouse.MouseMotion(x, y);
+	else
+		mouse.MouseMotionChangePos(x, y);
 	glutPostRedisplay();
 }
 
@@ -178,14 +171,7 @@ void KeyUp(unsigned char key, int x, int y)
 
 void UpdataScene()
 {
-	//basicScene->UpdateScene();
-	giScene->UpdateScene();
-	//assignmentScene1->UpdateScene();
-	//assignmentScene2->UpdateScene();
-	//assignmentScene3->UpdateScene();
-	//assignmentScene4->UpdateScene();
-	//animationScene1->UpdateScene();
-	//animationScene2->UpdateScene();
+	runningScene->UpdateScene();
 }
 
 
@@ -199,15 +185,7 @@ void Display()
 
 	ImGui::Render();
 
-
-	//basicScene->DisplayScene();
-	giScene->DisplayScene();
-	//assignmentScene1->DisplayScene();
-	//assignmentScene2->DisplayScene();
-	//assignmentScene3->DisplayScene();
-	//assignmentScene4->DisplayScene();
-	//animationScene1->DisplayScene();
-	//animationScene2->DisplayScene();
+	runningScene->DisplayScene();
 
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	glutSwapBuffers();
@@ -217,6 +195,5 @@ void Display()
 
 void ImGuiDisplay()
 {
-	//assignmentScene3->GUIDisplay();
-	//assignmentScene4->GUIDisplay();
+	runningScene->GUIDisplay();
 }

@@ -9,7 +9,9 @@
 #include "Mouse.h"
 #include "Keyboard.h"
 #include "LightHelper.h"
+#include "imgui.h"
 #include "stb_image_write.h"
+
 
 extern Mouse mouse;
 extern Keyboard keyboard;
@@ -27,6 +29,7 @@ public:
 	void virtual UpdateScene() {}
 	void virtual OnResize(int width, int height) {}
 	void virtual GUIDisplay() {}
+	void virtual MouseMotion(int x, int y) {}
 };
 
 #endif

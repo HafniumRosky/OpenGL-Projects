@@ -104,14 +104,14 @@ void Ball::LoadPBRTextures(MeshData& sphereMesh, bool loadTex)
 	}
 }
 
-void Ball::LoadGameObject(float gloss)
+void Ball::LoadGameObject(vec4 color, float gloss)
 {
 	MeshData sphereMesh;
 	sphereMesh.SetVertexType(m_type);
 	GenerateSphere(sphereMesh, m_radius, m_levels, m_slices, m_color);
 	m_meshVec.push_back(sphereMesh);
 	m_meshVec[0].m_material.ambient = vec4(0.19225f, 0.19225f, 0.19225f, 1.0f);
-	m_meshVec[0].m_material.diffuse = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_meshVec[0].m_material.diffuse = color;
 	m_meshVec[0].m_material.specular = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_meshVec[0].m_material.gloss = gloss;
 }

@@ -106,6 +106,66 @@ void Plane::LoadDebugObject(GLsizei texWidth, GLsizei texHeight)
 	m_meshVec.push_back(planeMesh);
 }
 
+void Plane::LoadPBRGameObject(vec3 albedo, float metallic, float roughness, float ao, vec4 emmisive)
+{
+	MeshData planeMesh;
+	planeMesh.SetVertexType(m_type);
+	planeMesh.m_PBRMaterial.albedo = albedo;
+	planeMesh.m_PBRMaterial.metallic = metallic;
+	planeMesh.m_PBRMaterial.roughness = roughness;
+	planeMesh.m_PBRMaterial.AO = ao;
+	m_emmision = emmisive;
+	GeneratePlane(planeMesh);
+	bool loadTex = true;
+	if (albedo.x >= 0)
+		loadTex = false;
+	LoadPBRTextures(planeMesh, loadTex);
+	m_meshVec.push_back(planeMesh);
+}
+
+void Plane::LoadPBRTextures(MeshData& planeMesh, bool loadTex)
+{
+	Texture albedoMap;
+	albedoMap.name = m_materialName + "_basecolor.png";
+	albedoMap.type = "albedo";
+	Texture metallicMap;
+	metallicMap.name = m_materialName + "_metallic.png";
+	metallicMap.type = "metallic";
+	Texture roughnessMap;
+	roughnessMap.name = m_materialName + "_roughness.png";
+	roughnessMap.type = "roughness";
+
+
+	if (loadTex)
+	{
+		SetUpTextureMapFromFile(m_texturePath, true, &albedoMap, GL_MIRRORED_REPEAT);
+		SetUpTextureMapFromFile(m_texturePath, true, &metallicMap, GL_MIRRORED_REPEAT);
+		SetUpTextureMapFromFile(m_texturePath, true, &roughnessMap, GL_MIRRORED_REPEAT);
+	}
+
+	planeMesh.m_TextureVec.push_back(albedoMap);
+	planeMesh.m_TextureVec.push_back(metallicMap);
+	planeMesh.m_TextureVec.push_back(roughnessMap);
+
+	if (m_loadNormal)
+	{
+		Texture normalMap;
+		normalMap.name = m_materialName + "_normal.png";
+		normalMap.type = "normal";
+		SetUpTextureMapFromFile(m_texturePath, true, &normalMap, GL_MIRRORED_REPEAT);
+		planeMesh.m_TextureVec.push_back(normalMap);
+	}
+
+	if (m_loadAO)
+	{
+		Texture aoMap;
+		aoMap.name = m_materialName + "_ao.png";
+		aoMap.type = "AO";
+		SetUpTextureMapFromFile(m_texturePath, true, &aoMap, GL_MIRRORED_REPEAT);
+		planeMesh.m_TextureVec.push_back(aoMap);
+	}
+}
+
 void Plane::GenerateDubugTexture(MeshData& planeMesh, GLsizei width, GLsizei height)
 {
 	Texture debugMap;
@@ -148,6 +208,75 @@ void Plane::DrawDebug()
 	Effect::cbDraw.worldInvTranspose = GetMeshInverseTranspose(0);
 	glBindBuffer(GL_UNIFORM_BUFFER, m_meshVec[0].m_pEffect->m_UBOid[0]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesEveryDrawing), &Effect::cbDraw, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	m_meshVec[0].BindVertexArray();
+	glDrawElements(GL_TRIANGLES, m_meshVec[0].m_indexVec.size(), GL_UNSIGNED_INT, 0);
+}
+
+void Plane::DrawPBR()
+{
+	this->GetTransform().ComputeLocalToWorldMatrix();
+	//Bind effect
+	m_meshVec[0].m_pEffect->BindEffect();
+	//Bind texture
+	std::vector<GLuint> texIDVec;
+	std::vector<const char*> texParaNameVec;
+	std::vector<GLenum> texTarget;
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[0].texID);
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[1].texID);
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[2].texID);
+	texParaNameVec.push_back("albedoMap");
+	texParaNameVec.push_back("metallicMap");
+	texParaNameVec.push_back("roughnessMap");
+	texTarget.push_back(GL_TEXTURE_2D);
+	texTarget.push_back(GL_TEXTURE_2D);
+	texTarget.push_back(GL_TEXTURE_2D);
+	//test
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[3].texID);
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[4].texID);
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[5].texID);
+	texParaNameVec.push_back("irradianceMap");
+	texParaNameVec.push_back("irradianceMap0");
+	texParaNameVec.push_back("irradianceMap1");
+	texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+	texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+	texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[6].texID);
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[7].texID);
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[8].texID);
+	texParaNameVec.push_back("prefilteredMap");
+	texParaNameVec.push_back("prefilteredMap0");
+	texParaNameVec.push_back("prefilteredMap1");
+	texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+	texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+	texTarget.push_back(GL_TEXTURE_CUBE_MAP);
+	texIDVec.push_back(m_meshVec[0].m_TextureVec[9].texID);
+	texParaNameVec.push_back("BRDFLUT");
+	texTarget.push_back(GL_TEXTURE_2D);
+
+	//Bind uniform
+	glUniform4fv(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "emmision"), 1, &m_emmision[0]);
+	glUniform3fv(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "probePos0"), 1, &m_probePos[0][0]);
+	glUniform3fv(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "probePos1"), 1, &m_probePos[1][0]);
+	glUniform1f(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "weight0"), m_probeWeight[0]);
+	glUniform1f(glGetUniformLocation(m_meshVec[0].m_pEffect->getShaderProgramID(), "weight1"), m_probeWeight[1]);
+
+	if (m_loadNormal)
+	{
+		texIDVec.push_back(m_meshVec[0].m_TextureVec[3].texID);
+		texParaNameVec.push_back("normalMap");
+		texTarget.push_back(GL_TEXTURE_2D);
+	}
+	m_meshVec[0].m_pEffect->BindTexture(texIDVec, texParaNameVec, texTarget);
+	//Update Constant Buffer(change every draw)
+	//World matrix
+	Effect::cbDrawPBR.world = GetMeshWorld(0);
+	//World inverse matrix
+	Effect::cbDrawPBR.worldInvTranspose = GetMeshInverseTranspose(0);
+	//Materials
+	Effect::cbDrawPBR.material = m_meshVec[0].m_PBRMaterial;
+	glBindBuffer(GL_UNIFORM_BUFFER, m_meshVec[0].m_pEffect->m_UBOid[5]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(CBChangesEveryDrawingPBR), &Effect::cbDrawPBR, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	m_meshVec[0].BindVertexArray();
 	glDrawElements(GL_TRIANGLES, m_meshVec[0].m_indexVec.size(), GL_UNSIGNED_INT, 0);

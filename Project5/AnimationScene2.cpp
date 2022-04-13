@@ -175,35 +175,8 @@ void AnimationScene2::UpdateScene()
 	//Update view
 	m_camera.LookAt(vec3(0.0f, 1.0f, 0.0f));
 	Effect::cbFrame.eyePos = m_camera.GetTransform().GetPosition();
-
-	//Update sphere location
-	/*if (keyboard.keyState.W)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() + vec3(0.0f, 0.0f, 2.0f * deltaTime));
-	}
-	if (keyboard.keyState.S)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() - vec3(0.0f, 0.0f, 2.0f * deltaTime));
-	}
-	if (keyboard.keyState.A)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() + vec3(2.0f * deltaTime, 0.0f, 0.0f));
-	}
-	if (keyboard.keyState.D)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() - vec3(2.0f * deltaTime, 0.0f, 0.0f));
-	}
-	if (keyboard.keyState.Q)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() + vec3(0.0f, 2.0f * deltaTime, 0.0f));
-	}
-	if (keyboard.keyState.E)
-	{
-		m_sphere.GetTransform().SetPosition(m_sphere.GetTransform().GetPosition() - vec3(0.0f, 2.0f * deltaTime, 0.0f));
-	}*/
 	vec3 test = m_militia.GetWorldMatrix() * vec4(m_militia.m_animationVec[0].GetTarget(), 1.0f);
-		//* m_militia.m_animationVec[0].GetEffector()->GetFinalMatrix()
-		//* m_militia.m_animationVec[0].GetEffector()->GetOffsetMatrix();
+
 	m_sphere.GetTransform().SetPosition(test);
 
 

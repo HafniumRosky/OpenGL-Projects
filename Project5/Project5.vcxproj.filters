@@ -73,6 +73,9 @@
     <Filter Include="Shader\PBR\IBL">
       <UniqueIdentifier>{2d458ba7-3cc3-4e43-a4a2-a394085d9035}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\SimpleShade">
+      <UniqueIdentifier>{a8e60ab6-8c99-49a0-8350-0744693b3700}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -185,6 +188,12 @@
     </ClCompile>
     <ClCompile Include="AnimationScene3.cpp">
       <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Face.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Arrow.cpp">
+      <Filter>GameObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -313,6 +322,12 @@
     </ClInclude>
     <ClInclude Include="AnimationScene3.h">
       <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Face.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Arrow.h">
+      <Filter>GameObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -459,6 +474,18 @@
     </None>
     <None Include="Assets\Shaders\IBLVS.glsl">
       <Filter>Shader\PBR\IBL</Filter>
+    </None>
+    <None Include="Assets\Shaders\SimpleShadeFS.glsl">
+      <Filter>Shader\SimpleShade</Filter>
+    </None>
+    <None Include="Assets\Shaders\SimpleShadeVS.glsl">
+      <Filter>Shader\SimpleShade</Filter>
+    </None>
+    <None Include="Assets\Shaders\BasicPBRFacialFS.glsl">
+      <Filter>Shader\PBR\BasicPBR</Filter>
+    </None>
+    <None Include="Assets\Shaders\BasicPBRFacialVS.glsl">
+      <Filter>Shader\PBR\BasicPBR</Filter>
     </None>
   </ItemGroup>
 </Project>

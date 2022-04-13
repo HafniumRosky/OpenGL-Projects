@@ -39,7 +39,9 @@ protected:
 	std::vector<MeshData> m_meshVec;
 	GLuint m_verticesCount = 0;
 	VertexType m_type;
-	bool m_hasBone;
+	bool m_hasBone = false;
+	bool m_blendShape = false;
+	int m_existMeshNum = 0;
 
 	//Node for animation
 	std::vector<Node> m_nodeTree;
@@ -60,7 +62,7 @@ protected:
 	GLuint m_shadowMapID;
 
 	//This function will load all properties into the aiScene pointer
-	void LoadGameObjectFromFile(std::string modelPath, std::string textureDir);
+	void LoadGameObjectFromFile(std::string modelPath, std::string textureDir, int existingMeshNum = 0);
 
 	//Load Textures
 	void SetUpTextureMapFromFile(const std::string directory, bool mipmap, Texture* pTexture, GLint texClamp = GL_REPEAT, int* pNumColorChannels = NULL);
@@ -73,6 +75,9 @@ public:
 	//Assemble the input data into GPU
 	void InputAssemble();
 	void InputAssemble(int index);
+
+	//Pick vertex from certain mesh giving screen coord(0.0 ~ 0.1). Return a vertex index
+	int PickVertex(int meshIndex, vec2 pickPos, mat4 proj, mat4 view, std::vector<unsigned int>& indeices, vec3 viewDir);
 
 	void virtual InitiAnimation() {}
 	void virtual LoadGameObject() {}
@@ -137,6 +142,11 @@ public:
 	void ResetVertexType(VertexType type, int index)
 	{
 		m_meshVec[index].SetVertexType(type);
+	}
+
+	MeshData& GetMesh(int index)
+	{
+		return m_meshVec[index];
 	}
 };
 #endif

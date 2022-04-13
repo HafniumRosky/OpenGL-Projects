@@ -514,7 +514,7 @@ void BasicScene::UpdateScene()
 	m_playerShip.Fire(normalize(viewDir), m_newRounds);
 	for (int i = 0; i < m_newRounds.size(); i++)
 	{
-		m_newRounds[i].LoadGameObject(8.0f);
+		m_newRounds[i].LoadGameObject(vec4(1.0f), 8.0f);
 		m_newRounds[i].SetMeshEffectWithIndex(&m_ballEffect, 0);
 		m_newRounds[i].InputAssemble();
 		m_rounds.push_back(m_newRounds[i]);

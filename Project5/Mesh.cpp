@@ -172,6 +172,7 @@ void MeshData::BindBuffers()
 
 void MeshData::ComputeOffset()
 {
+	this->m_offset = 0;
 	if (this->m_dataState.pos)
 		this->m_offset += 3;
 	if (this->m_dataState.normal)

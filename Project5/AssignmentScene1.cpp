@@ -78,7 +78,7 @@ void AssignmentScene1::Start()
 	{
 		m_Sphere[i] = Ball(VertexPosNormalColor, 0.5f, 20.0f, 20.0f, vec4(1.0f), "PBRRustedIron");
 		m_Sphere[i].GetTransform().SetPosition(vec3(4.5f, 4.0f - (i - 25) * 2.0f, 0.0f));
-		m_Sphere[i].LoadGameObject(8.0f + (i - 25) * 49.0f);
+		m_Sphere[i].LoadGameObject(vec4(1.0f), 8.0f + (i - 25) * 49.0f);
 		m_Sphere[i].SetMeshEffectWithIndex(&m_phongEffect, 0);
 	}
 
@@ -97,7 +97,7 @@ void AssignmentScene1::Start()
 	{
 		m_Sphere[i] = Ball(VertexPosNormal, 0.5f, 20.0f, 20.0f, vec4(1.0f), "PBRRustedIron");
 		m_Sphere[i].GetTransform().SetPosition(vec3(6.5f, 4.0f - (i - 30) * 2.0f, 0.0f));
-		m_Sphere[i].LoadGameObject(8.0f + (i - 30) * 49.0f);
+		m_Sphere[i].LoadGameObject(vec4(1.0f), 8.0f + (i - 30) * 49.0f);
 		
 	}
 

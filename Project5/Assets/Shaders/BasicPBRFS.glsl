@@ -65,6 +65,7 @@ in v2f
 uniform sampler2D albedoMap;
 uniform sampler2D metallicMap;
 uniform sampler2D roughnessMap;
+uniform vec4 emmision = vec4(0.0);
 //test
 uniform samplerCube irradianceMap;
 uniform samplerCube prefilteredMap;
@@ -184,7 +185,7 @@ void main()
 
 
 	vec3 ambient = vec3(0.3) * albedo * texture(irradianceMap, normalW).rgb;
-	vec3 color = ambient + Lo;
+	vec3 color = ambient + Lo  + emmision.rgb;
 
 	//color = color / (color + vec3(1.0));
 	color = pow(color, vec3(1.0/2.2)); 
